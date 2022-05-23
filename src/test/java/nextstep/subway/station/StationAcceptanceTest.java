@@ -45,11 +45,7 @@ class StationAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // then
-        List<String> stationNames =
-                RestAssured.given().log().all()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+        List<String> stationNames = 지하철역_목록_조회_요청().jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
 
@@ -84,10 +80,7 @@ class StationAcceptanceTest {
         지하철역_생성_요청("역삼역");
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = 지하철역_목록_조회_요청();
 
         // then
         List<String> stationNames = response.jsonPath().getList("name", String.class);
@@ -113,11 +106,7 @@ class StationAcceptanceTest {
                 .extract();
 
         // then
-        List<String> stationNames = RestAssured.given().log().all()
-                .when().get("/stations")
-                .then().log().all()
-                .extract()
-                .jsonPath().getList("name", String.class);
+        List<String> stationNames = 지하철역_목록_조회_요청().jsonPath().getList("name", String.class);
         assertThat(stationNames).doesNotContain("강남역").isEmpty();
     }
 
@@ -129,6 +118,13 @@ class StationAcceptanceTest {
                 .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/stations")
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> 지하철역_목록_조회_요청() {
+        return RestAssured.given().log().all()
+                .when().get("/stations")
                 .then().log().all()
                 .extract();
     }
