@@ -99,10 +99,24 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
     @Test
     void getLine() {
         //given
+        long 지하철역1_id = id추출(StationRestAssured.지하철역_생성_요청("지하철역1"));
+        long 지하철역2_id = id추출(StationRestAssured.지하철역_생성_요청("지하철역2"));
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", 신분당선);
+        params.put("color", "bg-red-600");
+        params.put("upStationId", 지하철역1_id);
+        params.put("downStationId", 지하철역2_id);
+        params.put("distance", 10);
+
+        String path = BaseRestAssured.post(LINE_URL, params).header("Location");
 
         // when
+        ExtractableResponse<Response> response = BaseRestAssured.get(path);
 
         // then
+        assertResponseStatus(response, HttpStatus.OK);
+        assertThat(response.jsonPath().getString("name")).isEqualTo(신분당선);
     }
 
     /**
