@@ -7,6 +7,7 @@ import nextstep.subway.BaseRestAssured;
 import nextstep.subway.station.StationRestAssured;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class LineAcceptanceTest extends BaseAcceptanceTest {
     private static final String LINE_URL = "/lines";
     private static final String 신분당선 = "신분당선";
+    private static final String 분당선 = "분당선";
 
     /**
      * When 지하철 노선을 생성하면
@@ -55,10 +57,37 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
     @Test
     void getLines() {
         //given
+        long 지하철역1_id = id추출(StationRestAssured.지하철역_생성_요청("지하철역1"));
+        long 지하철역2_id = id추출(StationRestAssured.지하철역_생성_요청("지하철역2"));
+
+        Map<String, Object> params1 = new HashMap<>();
+        params1.put("name", 신분당선);
+        params1.put("color", "bg-red-600");
+        params1.put("upStationId", 지하철역1_id);
+        params1.put("downStationId", 지하철역2_id);
+        params1.put("distance", 10);
+
+        BaseRestAssured.post(LINE_URL, params1);
+
+        long 지하철역3_id = id추출(StationRestAssured.지하철역_생성_요청("지하철역3"));
+        long 지하철역4_id = id추출(StationRestAssured.지하철역_생성_요청("지하철역4"));
+
+        Map<String, Object> params2 = new HashMap<>();
+        params2.put("name", 분당선);
+        params2.put("color", "bg-green-600");
+        params2.put("upStationId", 지하철역3_id);
+        params2.put("downStationId", 지하철역4_id);
+        params2.put("distance", 20);
+
+        BaseRestAssured.post(LINE_URL, params2);
 
         // when
+        ExtractableResponse<Response> response = BaseRestAssured.get(LINE_URL);
 
         // then
+        assertResponseStatus(response, HttpStatus.OK);
+        List<String> lineNames = 이름추출(response);
+        assertThat(lineNames).containsExactly(신분당선, 분당선);
     }
 
     /**
