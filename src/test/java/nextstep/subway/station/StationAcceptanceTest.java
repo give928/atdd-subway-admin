@@ -104,12 +104,12 @@ class StationAcceptanceTest extends BaseAcceptanceTest {
 
     private void 지하철역_응답_됨(ExtractableResponse<Response> response, String... containsStationNames) {
         assertResponseStatus(response, HttpStatus.OK);
-        List<String> stationNames = extractResponseJsonPath(response, "name");
+        List<String> stationNames = 이름추출(response);
         assertThat(stationNames).containsAnyOf(containsStationNames);
     }
 
     private void 지하철역_조회_안됨(String stationName) {
-        List<String> stationNames = extractResponseJsonPath(StationRestAssured.지하철역_목록_조회_요청(), "name");
+        List<String> stationNames = 이름추출(StationRestAssured.지하철역_목록_조회_요청());
         assertThat(stationNames).doesNotContain(stationName).isEmpty();
     }
 }

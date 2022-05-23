@@ -28,7 +28,11 @@ public class BaseAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(httpStatus.value());
     }
 
-    protected List<String> extractResponseJsonPath(ExtractableResponse<Response> response, String path) {
-        return response.jsonPath().getList(path, String.class);
+    protected List<String> 이름추출(ExtractableResponse<Response> response) {
+        return response.jsonPath().getList("name", String.class);
+    }
+
+    protected long id추출(ExtractableResponse<Response> response) {
+        return response.jsonPath().getLong("id");
     }
 }
