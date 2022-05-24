@@ -18,8 +18,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철노선 관련 기능")
 class LineAcceptanceTest extends BaseAcceptanceTest {
     private static final String LINE_URL = "/lines";
+
     private static final String 신분당선 = "신분당선";
     private static final String 분당선 = "분당선";
+    private static final String 빨간색 = "bg-red-600";
+    private static final String 초록색 = "bg-green-600";
+
     private Long 지하철역1_id;
     private Long 지하철역2_id;
     private Long 지하철역3_id;
@@ -32,7 +36,7 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
     @Test
     void createLine() {
         // when
-        지하철노선_생성_요청(신분당선, "bg-red-600", 지하철역1_id_요청(), 지하철역2_id_요청(), 10);
+        지하철노선_생성_요청(신분당선, 빨간색, 지하철역1_id_요청(), 지하철역2_id_요청(), 10);
 
         // then
         지하철노선_목록에서_조회됨(신분당선);
@@ -47,8 +51,8 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
     @Test
     void getLines() {
         //given
-        지하철노선_생성_요청(신분당선, "bg-red-600", 지하철역1_id_요청(), 지하철역2_id_요청(), 10);
-        지하철노선_생성_요청(분당선, "bg-green-600", 지하철역1_id_요청(), 지하철역3_id_요청(), 20);
+        지하철노선_생성_요청(신분당선, 빨간색, 지하철역1_id_요청(), 지하철역2_id_요청(), 10);
+        지하철노선_생성_요청(분당선, 초록색, 지하철역1_id_요청(), 지하철역3_id_요청(), 20);
 
         // when
         ExtractableResponse<Response> response = 지하철노선_목록_조회_요청();
@@ -66,7 +70,7 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
     @Test
     void getLine() {
         //given
-        String 신분당선_위치 = 지하철노선_생성_요청해서_위치_반환(신분당선, "bg-red-600", 지하철역1_id_요청(), 지하철역2_id_요청(), 10);
+        String 신분당선_위치 = 지하철노선_생성_요청해서_위치_반환(신분당선, 빨간색, 지하철역1_id_요청(), 지하철역2_id_요청(), 10);
 
         // when
         ExtractableResponse<Response> response = 지하철노선_조회_요청(신분당선_위치);
@@ -84,10 +88,10 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
     @Test
     void updateLine() {
         //given
-        String 신분당선_위치 = 지하철노선_생성_요청해서_위치_반환(신분당선, "bg-red-600", 지하철역1_id_요청(), 지하철역2_id_요청(), 10);
+        String 신분당선_위치 = 지하철노선_생성_요청해서_위치_반환(신분당선, 빨간색, 지하철역1_id_요청(), 지하철역2_id_요청(), 10);
 
         // when
-        ExtractableResponse<Response> response = 지하철노선_수정_요청(신분당선_위치, "다른분당선", "bg-red-600");
+        ExtractableResponse<Response> response = 지하철노선_수정_요청(신분당선_위치, "다른분당선", 빨간색);
 
         // then
         지하철노선_수정됨(response);
@@ -102,7 +106,7 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
     @Test
     void deleteLine() {
         //given
-        String 신분당선_위치 = 지하철노선_생성_요청해서_위치_반환(신분당선, "bg-red-600", 지하철역1_id_요청(), 지하철역2_id_요청(), 10);
+        String 신분당선_위치 = 지하철노선_생성_요청해서_위치_반환(신분당선, 빨간색, 지하철역1_id_요청(), 지하철역2_id_요청(), 10);
 
         // when
         ExtractableResponse<Response> response = 지하철노선_삭제_요청(신분당선_위치);
@@ -123,8 +127,7 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
         return BaseRestAssured.post(LINE_URL, params);
     }
 
-    private String 지하철노선_생성_요청해서_위치_반환(String name, String color, long upStationId, long downStationId,
-                                       int distance) {
+    private String 지하철노선_생성_요청해서_위치_반환(String name, String color, long upStationId, long downStationId, int distance) {
         return 지하철노선_생성_요청(name, color, upStationId, downStationId, distance).header("Location");
     }
 
