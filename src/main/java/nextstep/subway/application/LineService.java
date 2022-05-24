@@ -38,25 +38,24 @@ public class LineService {
     }
 
     public List<LineResponse> findAllLines() {
-        List<Line> lines = lineRepository.findAll();
-
-        return lines.stream()
+        return lineRepository.findAll()
+                .stream()
                 .map(LineResponse::of)
                 .collect(Collectors.toList());
     }
 
     public LineResponse findLine(Long id) {
-        Line line = lineRepository.findById(id)
+        return lineRepository.findById(id)
+                .map(LineResponse::of)
                 .orElseThrow(EntityNotFoundException::new);
-        return LineResponse.of(line);
     }
 
     @Transactional
     public void update(Long id, LineUpdateRequest lineUpdateRequest) {
-        Line line = lineRepository.findById(id)
+        Line persistLine = lineRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
 
-        line.update(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
+        persistLine.update(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
     }
 
     @Transactional
