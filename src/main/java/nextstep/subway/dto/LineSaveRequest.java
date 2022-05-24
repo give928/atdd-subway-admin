@@ -10,12 +10,24 @@ public class LineSaveRequest {
     private long downStationId;
     private int distance;
 
+    public String getName() {
+        return name;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
     public long getUpStationId() {
         return upStationId;
     }
 
     public long getDownStationId() {
         return downStationId;
+    }
+
+    public int getDistance() {
+        return distance;
     }
 
     public Line toLine(Station upStation, Station downStation) {
