@@ -68,7 +68,7 @@ class StationAcceptanceTest extends BaseAcceptanceTest {
         ExtractableResponse<Response> response = StationRestAssured.지하철역_목록_조회_요청();
 
         // then
-        지하철역_응답_됨(response, 강남역, 역삼역);
+        지하철역_응답됨(response, 강남역, 역삼역);
     }
 
     /**
@@ -99,10 +99,10 @@ class StationAcceptanceTest extends BaseAcceptanceTest {
 
     private void 지하철역_조회됨(String stationName) {
         ExtractableResponse<Response> response = StationRestAssured.지하철역_목록_조회_요청();
-        지하철역_응답_됨(response, stationName);
+        지하철역_응답됨(response, stationName);
     }
 
-    private void 지하철역_응답_됨(ExtractableResponse<Response> response, String... containsStationNames) {
+    private void 지하철역_응답됨(ExtractableResponse<Response> response, String... containsStationNames) {
         assertResponseStatus(response, HttpStatus.OK);
         List<String> stationNames = 이름추출(response);
         assertThat(stationNames).containsAnyOf(containsStationNames);
