@@ -20,6 +20,9 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
     private static final String LINE_URL = "/lines";
     private static final String 신분당선 = "신분당선";
     private static final String 분당선 = "분당선";
+    private Long 지하철역1_id;
+    private Long 지하철역2_id;
+    private Long 지하철역3_id;
 
     /**
      * When 지하철 노선을 생성하면
@@ -169,14 +172,23 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
     }
 
     private long 지하철역1_id_요청() {
-        return id추출(StationRestAssured.지하철역_생성_요청("지하철역1"));
+        if (지하철역1_id == null) {
+            지하철역1_id = id추출(StationRestAssured.지하철역_생성_요청("지하철역1"));
+        }
+        return 지하철역1_id;
     }
 
     private long 지하철역2_id_요청() {
-        return id추출(StationRestAssured.지하철역_생성_요청("지하철역1"));
+        if (지하철역2_id == null) {
+            지하철역2_id = id추출(StationRestAssured.지하철역_생성_요청("지하철역2"));
+        }
+        return 지하철역2_id;
     }
 
     private long 지하철역3_id_요청() {
-        return id추출(StationRestAssured.지하철역_생성_요청("지하철역3"));
+        if (지하철역3_id == null) {
+            지하철역3_id = id추출(StationRestAssured.지하철역_생성_요청("지하철역3"));
+        }
+        return 지하철역3_id;
     }
 }
