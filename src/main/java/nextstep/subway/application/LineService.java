@@ -52,13 +52,11 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse update(Long id, LineUpdateRequest lineUpdateRequest) {
+    public void update(Long id, LineUpdateRequest lineUpdateRequest) {
         Line line = lineRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
 
-        Line persistLine = line.update(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
-
-        return LineResponse.of(persistLine);
+        line.update(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
     }
 
     @Transactional
