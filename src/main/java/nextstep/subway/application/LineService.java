@@ -34,21 +34,21 @@ public class LineService {
 
         Line persistLine = lineRepository.save(lineSaveRequest.toLine(upStation, downStation));
 
-        return new LineResponse(persistLine);
+        return LineResponse.of(persistLine);
     }
 
     public List<LineResponse> findAllLines() {
         List<Line> lines = lineRepository.findAll();
 
         return lines.stream()
-                .map(LineResponse::new)
+                .map(LineResponse::of)
                 .collect(Collectors.toList());
     }
 
     public LineResponse findLine(Long id) {
         Line line = lineRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
-        return new LineResponse(line);
+        return LineResponse.of(line);
     }
 
     @Transactional
@@ -58,7 +58,7 @@ public class LineService {
 
         Line persistLine = line.update(lineUpdateRequest.getName(), lineUpdateRequest.getColor());
 
-        return new LineResponse(persistLine);
+        return LineResponse.of(persistLine);
     }
 
     @Transactional
