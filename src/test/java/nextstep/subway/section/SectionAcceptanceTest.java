@@ -137,11 +137,16 @@ class SectionAcceptanceTest extends BaseAcceptanceTest {
     @DisplayName("역 사이에 새로운 역을 등록할 경우 기존 역 사이 길이보다 크거나 같으면 등록을 할 수 없다.")
     @Test
     void cannotInsertInvalidDistanceStation() {
-        // given
-
         // when
+        Map<String, Object> params = new HashMap<>();
+        params.put("upStationId", 상행역_id);
+        params.put("downStationId", 새로운역_id);
+        params.put("distance", 10);
+
+        ExtractableResponse<Response> response = RestUtils.post(SECTION_URL, params);
 
         // then
+        assertResponseStatus(response, HttpStatus.BAD_REQUEST);
     }
 
     /**
