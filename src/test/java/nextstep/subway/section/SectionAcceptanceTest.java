@@ -156,7 +156,7 @@ class SectionAcceptanceTest extends BaseAcceptanceTest {
      */
     @DisplayName("상행역과 하행역이 이미 노선에 모두 등록되어 있다면 추가할 수 없다.")
     @Test
-    void cannotAddDuplicateStation() {
+    void cannotAddBothInsertedStation() {
         // given
         Map<String, Object> params = new HashMap<>();
         params.put("upStationId", 새로운역_id);
@@ -184,11 +184,20 @@ class SectionAcceptanceTest extends BaseAcceptanceTest {
      */
     @DisplayName("상행역과 하행역 둘 중 하나도 포함되어있지 않으면 추가할 수 없다.")
     @Test
-    void cannotAddBothInsertedStation() {
+    void cannotAddNotContainsStation() {
         // given
+        long 새로운상행역_id = RestUtils.id_추출(StationRestAssured.지하철역_생성_요청("상행역"));
+        long 새로운하행역_id = RestUtils.id_추출(StationRestAssured.지하철역_생성_요청("하행역"));
 
         // when
+        Map<String, Object> params = new HashMap<>();
+        params.put("upStationId", 새로운상행역_id);
+        params.put("downStationId", 새로운하행역_id);
+        params.put("distance", 10);
+
+        ExtractableResponse<Response> response = RestUtils.post(SECTION_URL, params);
 
         // then
+        assertResponseStatus(response, HttpStatus.BAD_REQUEST);
     }
 }
