@@ -1,5 +1,6 @@
-package nextstep.subway.domain;
+package nextstep.subway.station.domain;
 
+import nextstep.subway.domain.Station;
 import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
