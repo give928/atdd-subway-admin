@@ -10,16 +10,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철노선 관련 기능")
 class LineAcceptanceTest extends BaseAcceptanceTest {
-    private static final String LINE_URL = "/lines";
-
     private static final String 신분당선 = "신분당선";
     private static final String 분당선 = "분당선";
     private static final String 빨간색 = "bg-red-600";
@@ -44,7 +40,7 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
     @Test
     void createLine() {
         // when
-        지하철노선_생성_요청(신분당선, 빨간색, 지하철역1_id, 지하철역2_id, 10);
+        LineRestAssured.지하철노선_생성_요청(신분당선, 빨간색, 지하철역1_id, 지하철역2_id, 10);
 
         // then
         지하철노선_목록에서_조회됨(신분당선);
@@ -60,11 +56,11 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
     void getLines() {
         //given
         long 지하철역3_id = RestUtils.id_추출(StationRestAssured.지하철역_생성_요청("지하철역3"));
-        지하철노선_생성_요청(신분당선, 빨간색, 지하철역1_id, 지하철역2_id, 10);
-        지하철노선_생성_요청(분당선, 초록색, 지하철역1_id, 지하철역3_id, 20);
+        LineRestAssured.지하철노선_생성_요청(신분당선, 빨간색, 지하철역1_id, 지하철역2_id, 10);
+        LineRestAssured.지하철노선_생성_요청(분당선, 초록색, 지하철역1_id, 지하철역3_id, 20);
 
         // when
-        ExtractableResponse<Response> response = 지하철노선_목록_조회_요청();
+        ExtractableResponse<Response> response = LineRestAssured.지하철노선_목록_조회_요청();
 
         // then
         지하철노선_목록에서_응답됨(response, 신분당선, 분당선);
@@ -82,7 +78,7 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
         String 신분당선_위치 = 지하철노선_생성_요청해서_위치_반환(신분당선, 빨간색, 지하철역1_id, 지하철역2_id, 10);
 
         // when
-        ExtractableResponse<Response> response = 지하철노선_조회_요청(신분당선_위치);
+        ExtractableResponse<Response> response = LineRestAssured.지하철노선_조회_요청(신분당선_위치);
 
         // then
         지하철노선_응답됨(response, 신분당선);
@@ -100,7 +96,7 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
         String 신분당선_위치 = 지하철노선_생성_요청해서_위치_반환(신분당선, 빨간색, 지하철역1_id, 지하철역2_id, 10);
 
         // when
-        ExtractableResponse<Response> response = 지하철노선_수정_요청(신분당선_위치, "다른분당선", 빨간색);
+        ExtractableResponse<Response> response = LineRestAssured.지하철노선_수정_요청(신분당선_위치, "다른분당선", 빨간색);
 
         // then
         지하철노선_수정됨(response);
@@ -118,34 +114,18 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
         String 신분당선_위치 = 지하철노선_생성_요청해서_위치_반환(신분당선, 빨간색, 지하철역1_id, 지하철역2_id, 10);
 
         // when
-        ExtractableResponse<Response> response = 지하철노선_삭제_요청(신분당선_위치);
+        ExtractableResponse<Response> response = LineRestAssured.지하철노선_삭제_요청(신분당선_위치);
 
         // then
         지하철노선_삭제됨(response);
     }
 
-    private ExtractableResponse<Response> 지하철노선_생성_요청(String name, String color, long upStationId, long downStationId,
-                                                      int distance) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-        params.put("upStationId", upStationId);
-        params.put("downStationId", downStationId);
-        params.put("distance", distance);
-
-        return RestUtils.post(LINE_URL, params);
-    }
-
     private String 지하철노선_생성_요청해서_위치_반환(String name, String color, long upStationId, long downStationId, int distance) {
-        return 지하철노선_생성_요청(name, color, upStationId, downStationId, distance).header("Location");
-    }
-
-    private ExtractableResponse<Response> 지하철노선_목록_조회_요청() {
-        return RestUtils.get(LINE_URL);
+        return LineRestAssured.지하철노선_생성_요청(name, color, upStationId, downStationId, distance).header("Location");
     }
 
     private void 지하철노선_목록에서_조회됨(String lineName) {
-        ExtractableResponse<Response> response = 지하철노선_목록_조회_요청();
+        ExtractableResponse<Response> response = LineRestAssured.지하철노선_목록_조회_요청();
         지하철노선_목록에서_응답됨(response, lineName);
     }
 
@@ -155,28 +135,13 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
         assertThat(lineNames).containsExactly(containsLineNames);
     }
 
-    private ExtractableResponse<Response> 지하철노선_조회_요청(String path) {
-        return RestUtils.get(path);
-    }
-
     private void 지하철노선_응답됨(ExtractableResponse<Response> response, String lineName) {
         assertResponseStatus(response, HttpStatus.OK);
         assertThat(response.jsonPath().getString("name")).isEqualTo(lineName);
     }
 
-    private ExtractableResponse<Response> 지하철노선_수정_요청(String path, String name, String color) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-        return RestUtils.put(path, params);
-    }
-
     private void 지하철노선_수정됨(ExtractableResponse<Response> response) {
         assertResponseStatus(response, HttpStatus.OK);
-    }
-
-    private ExtractableResponse<Response> 지하철노선_삭제_요청(String 신분당선_위치) {
-        return RestUtils.delete(신분당선_위치);
     }
 
     private void 지하철노선_삭제됨(ExtractableResponse<Response> response) {
