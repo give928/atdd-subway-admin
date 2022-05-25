@@ -21,7 +21,7 @@ public class BaseAcceptanceTest {
     DatabaseCleanup databaseCleanup;
 
     @BeforeEach
-    void setUp() {
+    protected void setUp() {
         if (RestAssured.port == RestAssured.UNDEFINED_PORT) {
             RestAssured.port = port;
             databaseCleanup.afterPropertiesSet();

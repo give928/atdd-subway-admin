@@ -5,6 +5,7 @@ import io.restassured.response.Response;
 import nextstep.subway.BaseAcceptanceTest;
 import nextstep.subway.station.StationRestAssured;
 import nextstep.subway.util.RestUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -24,9 +25,16 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
     private static final String 빨간색 = "bg-red-600";
     private static final String 초록색 = "bg-green-600";
 
-    private Long 지하철역1_id;
-    private Long 지하철역2_id;
-    private Long 지하철역3_id;
+    private long 지하철역1_id;
+    private long 지하철역2_id;
+
+    @BeforeEach
+    protected void setUp() {
+        super.setUp();
+
+        지하철역1_id = RestUtils.id_추출(StationRestAssured.지하철역_생성_요청("지하철역1"));
+        지하철역2_id = RestUtils.id_추출(StationRestAssured.지하철역_생성_요청("지하철역2"));
+    }
 
     /**
      * When 지하철 노선을 생성하면
@@ -36,7 +44,7 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
     @Test
     void createLine() {
         // when
-        지하철노선_생성_요청(신분당선, 빨간색, 지하철역1_id_요청(), 지하철역2_id_요청(), 10);
+        지하철노선_생성_요청(신분당선, 빨간색, 지하철역1_id, 지하철역2_id, 10);
 
         // then
         지하철노선_목록에서_조회됨(신분당선);
@@ -51,8 +59,9 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
     @Test
     void getLines() {
         //given
-        지하철노선_생성_요청(신분당선, 빨간색, 지하철역1_id_요청(), 지하철역2_id_요청(), 10);
-        지하철노선_생성_요청(분당선, 초록색, 지하철역1_id_요청(), 지하철역3_id_요청(), 20);
+        long 지하철역3_id = RestUtils.id_추출(StationRestAssured.지하철역_생성_요청("지하철역3"));
+        지하철노선_생성_요청(신분당선, 빨간색, 지하철역1_id, 지하철역2_id, 10);
+        지하철노선_생성_요청(분당선, 초록색, 지하철역1_id, 지하철역3_id, 20);
 
         // when
         ExtractableResponse<Response> response = 지하철노선_목록_조회_요청();
@@ -70,7 +79,7 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
     @Test
     void getLine() {
         //given
-        String 신분당선_위치 = 지하철노선_생성_요청해서_위치_반환(신분당선, 빨간색, 지하철역1_id_요청(), 지하철역2_id_요청(), 10);
+        String 신분당선_위치 = 지하철노선_생성_요청해서_위치_반환(신분당선, 빨간색, 지하철역1_id, 지하철역2_id, 10);
 
         // when
         ExtractableResponse<Response> response = 지하철노선_조회_요청(신분당선_위치);
@@ -88,7 +97,7 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
     @Test
     void updateLine() {
         //given
-        String 신분당선_위치 = 지하철노선_생성_요청해서_위치_반환(신분당선, 빨간색, 지하철역1_id_요청(), 지하철역2_id_요청(), 10);
+        String 신분당선_위치 = 지하철노선_생성_요청해서_위치_반환(신분당선, 빨간색, 지하철역1_id, 지하철역2_id, 10);
 
         // when
         ExtractableResponse<Response> response = 지하철노선_수정_요청(신분당선_위치, "다른분당선", 빨간색);
@@ -106,7 +115,7 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
     @Test
     void deleteLine() {
         //given
-        String 신분당선_위치 = 지하철노선_생성_요청해서_위치_반환(신분당선, 빨간색, 지하철역1_id_요청(), 지하철역2_id_요청(), 10);
+        String 신분당선_위치 = 지하철노선_생성_요청해서_위치_반환(신분당선, 빨간색, 지하철역1_id, 지하철역2_id, 10);
 
         // when
         ExtractableResponse<Response> response = 지하철노선_삭제_요청(신분당선_위치);
@@ -172,26 +181,5 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
 
     private void 지하철노선_삭제됨(ExtractableResponse<Response> response) {
         assertResponseStatus(response, HttpStatus.NO_CONTENT);
-    }
-
-    private long 지하철역1_id_요청() {
-        if (지하철역1_id == null) {
-            지하철역1_id = RestUtils.id_추출(StationRestAssured.지하철역_생성_요청("지하철역1"));
-        }
-        return 지하철역1_id;
-    }
-
-    private long 지하철역2_id_요청() {
-        if (지하철역2_id == null) {
-            지하철역2_id = RestUtils.id_추출(StationRestAssured.지하철역_생성_요청("지하철역2"));
-        }
-        return 지하철역2_id;
-    }
-
-    private long 지하철역3_id_요청() {
-        if (지하철역3_id == null) {
-            지하철역3_id = RestUtils.id_추출(StationRestAssured.지하철역_생성_요청("지하철역3"));
-        }
-        return 지하철역3_id;
     }
 }
