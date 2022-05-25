@@ -5,8 +5,6 @@ import javax.persistence.*;
 @Entity
 @Table(uniqueConstraints = {@UniqueConstraint(name = "uk_section", columnNames = {"line_id", "up_station_id", "down_station_id"})})
 public class Section extends BaseEntity {
-    private static final int MIN_DISTANCE = 1;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -19,8 +17,8 @@ public class Section extends BaseEntity {
     @JoinColumn(name = "down_station_id", nullable = false, foreignKey = @ForeignKey(name = "fk_section_down_station"))
     private Station downStation;
 
-    @Column(nullable = false)
-    private int distance;
+    @Embedded
+    private Distance distance;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "line_id", nullable = false, foreignKey = @ForeignKey(name = "fk_section_line"))
@@ -33,8 +31,7 @@ public class Section extends BaseEntity {
         validateStation(upStation, downStation);
         this.upStation = upStation;
         this.downStation = downStation;
-        validateDistance(distance);
-        this.distance = distance;
+        this.distance = Distance.of(distance);
     }
 
     private void validateStation(Station upStation, Station downStation) {
@@ -46,13 +43,6 @@ public class Section extends BaseEntity {
         }
         if (upStation.isSameStation(downStation)) {
             throw new IllegalArgumentException(ErrorMessages.REQUIRED_DIFFERENT_SECTION_STATIONS);
-        }
-    }
-
-    private void validateDistance(int distance) {
-        if (distance < MIN_DISTANCE) {
-            throw new IllegalArgumentException(
-                    String.format(ErrorMessages.REQUIRED_GREATER_THAN_OR_EQUAL_TO_SECTION_DISTANCE, MIN_DISTANCE));
         }
     }
 
@@ -73,7 +63,7 @@ public class Section extends BaseEntity {
     }
 
     public int getDistance() {
-        return distance;
+        return distance.get();
     }
 
     public Line getLine() {
@@ -86,13 +76,12 @@ public class Section extends BaseEntity {
                 "id=" + id +
                 ", upStation=" + upStation +
                 ", downStation=" + downStation +
-                ", distance=" + distance +
+                ", distance=" + distance.get() +
                 ", line.id=" + line.getId() +
                 '}';
     }
 
     private static final class ErrorMessages {
-        private static final String REQUIRED_GREATER_THAN_OR_EQUAL_TO_SECTION_DISTANCE = "지하철구간의 거리는 %d 이상만 가능합니다.";
         private static final String REQUIRED_SECTION_UP_STATION = "지하철구간의 상행 지하철역은 필수입니다.";
         private static final String REQUIRED_SECTION_DOWN_STATION = "지하철구간의 하행 지하철역은 필수입니다.";
         private static final String REQUIRED_DIFFERENT_SECTION_STATIONS = "지하철구간의 상행 지하철역과 하행 지하철역을 하나의 역으로 지정할 수 없습니다.";
