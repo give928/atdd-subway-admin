@@ -57,20 +57,15 @@ class SectionAcceptanceTest extends BaseAcceptanceTest {
     @Test
     void insertStation() {
         // when
-        Map<String, Object> params = new HashMap<>();
-        params.put("upStationId", 상행역_id);
-        params.put("downStationId", 새로운역_id);
-        params.put("distance", 4);
-
-        ExtractableResponse<Response> response = RestUtils.post(SECTION_URL, params);
+        ExtractableResponse<Response> response = 지하철구간_등록_요청(상행역_id, 새로운역_id, 9);
 
         // then
         assertResponseStatus(response, HttpStatus.CREATED);
 
         // then
         List<Section> sections = sectionRepository.findAll();
-        assertThat(sections.get(0).getDistance()).isEqualTo(6);
-        assertThat(sections.get(1).getDistance()).isEqualTo(4);
+        assertThat(sections.get(0).getDistance()).isEqualTo(1);
+        assertThat(sections.get(1).getDistance()).isEqualTo(9);
     }
 
     /**
@@ -83,12 +78,7 @@ class SectionAcceptanceTest extends BaseAcceptanceTest {
     @Test
     void addUpStation() {
         // when
-        Map<String, Object> params = new HashMap<>();
-        params.put("upStationId", 새로운역_id);
-        params.put("downStationId", 상행역_id);
-        params.put("distance", 10);
-
-        ExtractableResponse<Response> response = RestUtils.post(SECTION_URL, params);
+        ExtractableResponse<Response> response = 지하철구간_등록_요청(새로운역_id, 상행역_id, 10);
 
         // then
         assertResponseStatus(response, HttpStatus.CREATED);
@@ -111,12 +101,7 @@ class SectionAcceptanceTest extends BaseAcceptanceTest {
     @Test
     void addDownStation() {
         // when
-        Map<String, Object> params = new HashMap<>();
-        params.put("upStationId", 하행역_id);
-        params.put("downStationId", 새로운역_id);
-        params.put("distance", 10);
-
-        ExtractableResponse<Response> response = RestUtils.post(SECTION_URL, params);
+        ExtractableResponse<Response> response = 지하철구간_등록_요청(하행역_id, 새로운역_id, 10);
 
         // then
         assertResponseStatus(response, HttpStatus.CREATED);
@@ -138,12 +123,7 @@ class SectionAcceptanceTest extends BaseAcceptanceTest {
     @Test
     void cannotInsertInvalidDistanceStation() {
         // when
-        Map<String, Object> params = new HashMap<>();
-        params.put("upStationId", 상행역_id);
-        params.put("downStationId", 새로운역_id);
-        params.put("distance", 10);
-
-        ExtractableResponse<Response> response = RestUtils.post(SECTION_URL, params);
+        ExtractableResponse<Response> response = 지하철구간_등록_요청(상행역_id, 새로운역_id, 10);
 
         // then
         assertResponseStatus(response, HttpStatus.BAD_REQUEST);
@@ -158,20 +138,10 @@ class SectionAcceptanceTest extends BaseAcceptanceTest {
     @Test
     void cannotAddBothInsertedStation() {
         // given
-        Map<String, Object> params = new HashMap<>();
-        params.put("upStationId", 새로운역_id);
-        params.put("downStationId", 상행역_id);
-        params.put("distance", 10);
-
-        RestUtils.post(SECTION_URL, params);
+        지하철구간_등록_요청(새로운역_id, 상행역_id, 10);
 
         // when
-        params.clear();
-        params.put("upStationId", 새로운역_id);
-        params.put("downStationId", 하행역_id);
-        params.put("distance", 20);
-
-        ExtractableResponse<Response> response = RestUtils.post(SECTION_URL, params);
+        ExtractableResponse<Response> response = 지하철구간_등록_요청(새로운역_id, 하행역_id, 20);
 
         // then
         assertResponseStatus(response, HttpStatus.BAD_REQUEST);
@@ -190,14 +160,18 @@ class SectionAcceptanceTest extends BaseAcceptanceTest {
         long 새로운하행역_id = RestUtils.id_추출(StationRestAssured.지하철역_생성_요청("하행역"));
 
         // when
-        Map<String, Object> params = new HashMap<>();
-        params.put("upStationId", 새로운상행역_id);
-        params.put("downStationId", 새로운하행역_id);
-        params.put("distance", 10);
-
-        ExtractableResponse<Response> response = RestUtils.post(SECTION_URL, params);
+        ExtractableResponse<Response> response = 지하철구간_등록_요청(새로운상행역_id, 새로운하행역_id, 10);
 
         // then
         assertResponseStatus(response, HttpStatus.BAD_REQUEST);
+    }
+
+    private ExtractableResponse<Response> 지하철구간_등록_요청(long upStationId, long downStationId, int distance) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+        params.put("distance", distance);
+
+        return RestUtils.post(SECTION_URL, params);
     }
 }
