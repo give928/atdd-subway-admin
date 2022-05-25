@@ -40,6 +40,21 @@ public class Station extends BaseEntity {
         return name;
     }
 
+    public boolean isSameStation(Station station) {
+        if (isSameStationId(station)) {
+            return true;
+        }
+        return isSameStationName(station);
+    }
+
+    private boolean isSameStationId(Station station) {
+        return getId() != null && getId().equals(station.getId());
+    }
+
+    private boolean isSameStationName(Station station) {
+        return getName() != null && getName().equals(station.getName());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

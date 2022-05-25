@@ -44,7 +44,7 @@ public class Section extends BaseEntity {
         if (downStation == null) {
             throw new IllegalArgumentException(ErrorMessages.REQUIRED_SECTION_DOWN_STATION);
         }
-        if (upStation.equals(downStation)) {
+        if (upStation.isSameStation(downStation)) {
             throw new IllegalArgumentException(ErrorMessages.REQUIRED_DIFFERENT_SECTION_STATIONS);
         }
     }
