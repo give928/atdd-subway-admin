@@ -1,13 +1,25 @@
-package nextstep.subway;
+package nextstep.subway.util;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
 
+import java.util.List;
 import java.util.Map;
 
-public class BaseRestAssured {
+public final class RestUtils {
+    private RestUtils() {
+    }
+
+    public static List<String> 이름_추출(ExtractableResponse<Response> response) {
+        return response.jsonPath().getList("name", String.class);
+    }
+
+    public static long id_추출(ExtractableResponse<Response> response) {
+        return response.jsonPath().getLong("id");
+    }
+
     public static ExtractableResponse<Response> get(String path) {
         return RestAssured.given().log().all()
                 .when().get(path)

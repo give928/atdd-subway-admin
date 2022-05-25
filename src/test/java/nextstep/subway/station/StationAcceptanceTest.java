@@ -3,6 +3,7 @@ package nextstep.subway.station;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.BaseAcceptanceTest;
+import nextstep.subway.util.RestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -104,12 +105,12 @@ class StationAcceptanceTest extends BaseAcceptanceTest {
 
     private void 지하철역_응답됨(ExtractableResponse<Response> response, String... containsStationNames) {
         assertResponseStatus(response, HttpStatus.OK);
-        List<String> stationNames = 이름추출(response);
+        List<String> stationNames = RestUtils.이름_추출(response);
         assertThat(stationNames).containsAnyOf(containsStationNames);
     }
 
     private void 지하철역_조회_안됨(String stationName) {
-        List<String> stationNames = 이름추출(StationRestAssured.지하철역_목록_조회_요청());
+        List<String> stationNames = RestUtils.이름_추출(StationRestAssured.지하철역_목록_조회_요청());
         assertThat(stationNames).doesNotContain(stationName).isEmpty();
     }
 }

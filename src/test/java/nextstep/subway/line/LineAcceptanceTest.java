@@ -3,8 +3,8 @@ package nextstep.subway.line;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import nextstep.subway.BaseAcceptanceTest;
-import nextstep.subway.BaseRestAssured;
 import nextstep.subway.station.StationRestAssured;
+import nextstep.subway.util.RestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -124,7 +124,7 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
         params.put("downStationId", downStationId);
         params.put("distance", distance);
 
-        return BaseRestAssured.post(LINE_URL, params);
+        return RestUtils.post(LINE_URL, params);
     }
 
     private String 지하철노선_생성_요청해서_위치_반환(String name, String color, long upStationId, long downStationId, int distance) {
@@ -132,7 +132,7 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
     }
 
     private ExtractableResponse<Response> 지하철노선_목록_조회_요청() {
-        return BaseRestAssured.get(LINE_URL);
+        return RestUtils.get(LINE_URL);
     }
 
     private void 지하철노선_목록에서_조회됨(String lineName) {
@@ -142,12 +142,12 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
 
     private void 지하철노선_목록에서_응답됨(ExtractableResponse<Response> response, String... containsLineNames) {
         assertResponseStatus(response, HttpStatus.OK);
-        List<String> lineNames = 이름추출(response);
+        List<String> lineNames = RestUtils.이름_추출(response);
         assertThat(lineNames).containsExactly(containsLineNames);
     }
 
     private ExtractableResponse<Response> 지하철노선_조회_요청(String path) {
-        return BaseRestAssured.get(path);
+        return RestUtils.get(path);
     }
 
     private void 지하철노선_응답됨(ExtractableResponse<Response> response, String lineName) {
@@ -159,7 +159,7 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
         Map<String, Object> params = new HashMap<>();
         params.put("name", name);
         params.put("color", color);
-        return BaseRestAssured.put(path, params);
+        return RestUtils.put(path, params);
     }
 
     private void 지하철노선_수정됨(ExtractableResponse<Response> response) {
@@ -167,7 +167,7 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
     }
 
     private ExtractableResponse<Response> 지하철노선_삭제_요청(String 신분당선_위치) {
-        return BaseRestAssured.delete(신분당선_위치);
+        return RestUtils.delete(신분당선_위치);
     }
 
     private void 지하철노선_삭제됨(ExtractableResponse<Response> response) {
@@ -176,21 +176,21 @@ class LineAcceptanceTest extends BaseAcceptanceTest {
 
     private long 지하철역1_id_요청() {
         if (지하철역1_id == null) {
-            지하철역1_id = id추출(StationRestAssured.지하철역_생성_요청("지하철역1"));
+            지하철역1_id = RestUtils.id_추출(StationRestAssured.지하철역_생성_요청("지하철역1"));
         }
         return 지하철역1_id;
     }
 
     private long 지하철역2_id_요청() {
         if (지하철역2_id == null) {
-            지하철역2_id = id추출(StationRestAssured.지하철역_생성_요청("지하철역2"));
+            지하철역2_id = RestUtils.id_추출(StationRestAssured.지하철역_생성_요청("지하철역2"));
         }
         return 지하철역2_id;
     }
 
     private long 지하철역3_id_요청() {
         if (지하철역3_id == null) {
-            지하철역3_id = id추출(StationRestAssured.지하철역_생성_요청("지하철역3"));
+            지하철역3_id = RestUtils.id_추출(StationRestAssured.지하철역_생성_요청("지하철역3"));
         }
         return 지하철역3_id;
     }
