@@ -82,11 +82,23 @@ class SectionAcceptanceTest extends BaseAcceptanceTest {
     @DisplayName("새로운 역을 상행 종점으로 등록한다.")
     @Test
     void addUpStation() {
-        // given
-
         // when
+        Map<String, Object> params = new HashMap<>();
+        params.put("upStationId", 새로운역_id);
+        params.put("downStationId", 상행역_id);
+        params.put("distance", 10);
+
+        ExtractableResponse<Response> response = RestUtils.post(SECTION_URL, params);
 
         // then
+        assertResponseStatus(response, HttpStatus.CREATED);
+
+        // then
+        List<Section> sections = sectionRepository.findAll();
+        assertThat(sections.get(0).getDownStation().getId()).isEqualTo(하행역_id);
+        assertThat(sections.get(0).getUpStation().getId()).isEqualTo(상행역_id);
+        assertThat(sections.get(1).getDownStation().getId()).isEqualTo(상행역_id);
+        assertThat(sections.get(1).getUpStation().getId()).isEqualTo(새로운역_id);
     }
 
     /**
