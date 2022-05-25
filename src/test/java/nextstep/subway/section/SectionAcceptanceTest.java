@@ -158,10 +158,23 @@ class SectionAcceptanceTest extends BaseAcceptanceTest {
     @Test
     void cannotAddDuplicateStation() {
         // given
+        Map<String, Object> params = new HashMap<>();
+        params.put("upStationId", 새로운역_id);
+        params.put("downStationId", 상행역_id);
+        params.put("distance", 10);
+
+        RestUtils.post(SECTION_URL, params);
 
         // when
+        params.clear();
+        params.put("upStationId", 새로운역_id);
+        params.put("downStationId", 하행역_id);
+        params.put("distance", 20);
+
+        ExtractableResponse<Response> response = RestUtils.post(SECTION_URL, params);
 
         // then
+        assertResponseStatus(response, HttpStatus.BAD_REQUEST);
     }
 
     /**
