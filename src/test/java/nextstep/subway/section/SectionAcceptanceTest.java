@@ -60,12 +60,10 @@ class SectionAcceptanceTest extends BaseAcceptanceTest {
         ExtractableResponse<Response> response = 지하철구간_등록_요청(상행역_id, 새로운역_id, 9);
 
         // then
-        assertResponseStatus(response, HttpStatus.CREATED);
+        지하철구간_등록됨(response);
 
         // then
-        List<Section> sections = sectionRepository.findAll();
-        assertThat(sections.get(0).getDistance()).isEqualTo(1);
-        assertThat(sections.get(1).getDistance()).isEqualTo(9);
+        지하철구간_길이_검증(1, 9);
     }
 
     /**
@@ -81,14 +79,10 @@ class SectionAcceptanceTest extends BaseAcceptanceTest {
         ExtractableResponse<Response> response = 지하철구간_등록_요청(새로운역_id, 상행역_id, 10);
 
         // then
-        assertResponseStatus(response, HttpStatus.CREATED);
+        지하철구간_등록됨(response);
 
         // then
-        List<Section> sections = sectionRepository.findAll();
-        assertThat(sections.get(0).getDownStation().getId()).isEqualTo(하행역_id);
-        assertThat(sections.get(0).getUpStation().getId()).isEqualTo(상행역_id);
-        assertThat(sections.get(1).getDownStation().getId()).isEqualTo(상행역_id);
-        assertThat(sections.get(1).getUpStation().getId()).isEqualTo(새로운역_id);
+        상행_종점역_검증(새로운역_id, 상행역_id, 하행역_id);
     }
 
     /**
@@ -104,14 +98,10 @@ class SectionAcceptanceTest extends BaseAcceptanceTest {
         ExtractableResponse<Response> response = 지하철구간_등록_요청(하행역_id, 새로운역_id, 10);
 
         // then
-        assertResponseStatus(response, HttpStatus.CREATED);
+        지하철구간_등록됨(response);
 
         // then
-        List<Section> sections = sectionRepository.findAll();
-        assertThat(sections.get(0).getDownStation().getId()).isEqualTo(하행역_id);
-        assertThat(sections.get(0).getUpStation().getId()).isEqualTo(상행역_id);
-        assertThat(sections.get(1).getDownStation().getId()).isEqualTo(새로운역_id);
-        assertThat(sections.get(1).getUpStation().getId()).isEqualTo(하행역_id);
+        하행_종점역_검증(상행역_id, 하행역_id, 새로운역_id);
     }
 
     /**
@@ -126,7 +116,7 @@ class SectionAcceptanceTest extends BaseAcceptanceTest {
         ExtractableResponse<Response> response = 지하철구간_등록_요청(상행역_id, 새로운역_id, 10);
 
         // then
-        assertResponseStatus(response, HttpStatus.BAD_REQUEST);
+        지하철구간_등록_안됨(response);
     }
 
     /**
@@ -144,7 +134,7 @@ class SectionAcceptanceTest extends BaseAcceptanceTest {
         ExtractableResponse<Response> response = 지하철구간_등록_요청(새로운역_id, 하행역_id, 20);
 
         // then
-        assertResponseStatus(response, HttpStatus.BAD_REQUEST);
+        지하철구간_등록_안됨(response);
     }
 
     /**
@@ -163,7 +153,7 @@ class SectionAcceptanceTest extends BaseAcceptanceTest {
         ExtractableResponse<Response> response = 지하철구간_등록_요청(새로운상행역_id, 새로운하행역_id, 10);
 
         // then
-        assertResponseStatus(response, HttpStatus.BAD_REQUEST);
+        지하철구간_등록_안됨(response);
     }
 
     private ExtractableResponse<Response> 지하철구간_등록_요청(long upStationId, long downStationId, int distance) {
@@ -173,5 +163,35 @@ class SectionAcceptanceTest extends BaseAcceptanceTest {
         params.put("distance", distance);
 
         return RestUtils.post(SECTION_URL, params);
+    }
+
+    private void 지하철구간_등록됨(ExtractableResponse<Response> response) {
+        assertResponseStatus(response, HttpStatus.CREATED);
+    }
+
+    private void 지하철구간_등록_안됨(ExtractableResponse<Response> response) {
+        assertResponseStatus(response, HttpStatus.BAD_REQUEST);
+    }
+
+    private void 지하철구간_길이_검증(int distance1, int distance2) {
+        List<Section> sections = sectionRepository.findAll();
+        assertThat(sections.get(0).getDistance()).isEqualTo(distance1);
+        assertThat(sections.get(1).getDistance()).isEqualTo(distance2);
+    }
+
+    private void 상행_종점역_검증(long upStationId, long middleStationId, long downStationId) {
+        List<Section> sections = sectionRepository.findAll();
+        assertThat(sections.get(0).getDownStation().getId()).isEqualTo(downStationId);
+        assertThat(sections.get(0).getUpStation().getId()).isEqualTo(middleStationId);
+        assertThat(sections.get(1).getDownStation().getId()).isEqualTo(middleStationId);
+        assertThat(sections.get(1).getUpStation().getId()).isEqualTo(upStationId);
+    }
+
+    private void 하행_종점역_검증(long upStationId, long middleStationId, long downStationId) {
+        List<Section> sections = sectionRepository.findAll();
+        assertThat(sections.get(0).getDownStation().getId()).isEqualTo(middleStationId);
+        assertThat(sections.get(0).getUpStation().getId()).isEqualTo(upStationId);
+        assertThat(sections.get(1).getDownStation().getId()).isEqualTo(downStationId);
+        assertThat(sections.get(1).getUpStation().getId()).isEqualTo(middleStationId);
     }
 }
