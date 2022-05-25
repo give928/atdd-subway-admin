@@ -1,11 +1,52 @@
 package nextstep.subway.section;
 
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import nextstep.subway.BaseAcceptanceTest;
+import nextstep.subway.domain.Section;
+import nextstep.subway.domain.SectionRepository;
+import nextstep.subway.line.LineRestAssured;
+import nextstep.subway.station.StationRestAssured;
+import nextstep.subway.util.RestUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철구간 관련 기능")
 class SectionAcceptanceTest extends BaseAcceptanceTest {
+    private static final String 신분당선 = "신분당선";
+
+    @Autowired
+    private SectionRepository sectionRepository;
+
+    private String SECTION_URL;
+
+    private long 노선_id;
+    private long 상행역_id;
+    private long 하행역_id;
+    private long 새로운역_id;
+
+    @BeforeEach
+    protected void setUp() {
+        super.setUp();
+
+        상행역_id = RestUtils.id_추출(StationRestAssured.지하철역_생성_요청("상행역"));
+        하행역_id = RestUtils.id_추출(StationRestAssured.지하철역_생성_요청("하행역"));
+        노선_id = RestUtils.id_추출(LineRestAssured.지하철노선_생성_요청("신분당선", "bg-red-600", 상행역_id, 하행역_id, 10));
+
+        새로운역_id = RestUtils.id_추출(StationRestAssured.지하철역_생성_요청("새로운역"));
+
+        SECTION_URL = String.format("/lines/%d/sections", 노선_id);
+    }
+
     /**
      * Given 지하철 구간을 등록하고
      * When 구간 사이에 동일한 상행 또는 하행역과 새로운 역으로 구간을 등록하면
@@ -15,11 +56,21 @@ class SectionAcceptanceTest extends BaseAcceptanceTest {
     @DisplayName("역 사이에 새로운 역을 등록한다.")
     @Test
     void insertStation() {
-        // given
-
         // when
+        Map<String, Object> params = new HashMap<>();
+        params.put("upStationId", 상행역_id);
+        params.put("downStationId", 새로운역_id);
+        params.put("distance", 4);
+
+        ExtractableResponse<Response> response = RestUtils.post(SECTION_URL, params);
 
         // then
+        assertResponseStatus(response, HttpStatus.CREATED);
+
+        // then
+        List<Section> sections = sectionRepository.findAll();
+        assertThat(sections.get(0).getDistance()).isEqualTo(6);
+        assertThat(sections.get(1).getDistance()).isEqualTo(4);
     }
 
     /**
