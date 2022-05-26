@@ -72,6 +72,40 @@ public class Section extends BaseEntity {
         }
     }
 
+    public void mergeSection(Section section) {
+        if (isOuter(section)) {
+            mergeStation(section);
+            mergeDistance(section);
+        }
+    }
+
+    private void mergeStation(Section section) {
+        boolean changedDownStation = changeDownStation(section);
+        if (!changedDownStation) {
+            changeUpStation(section);
+        }
+    }
+
+    private boolean changeDownStation(Section section) {
+        if (downStation.isSame(section.getUpStation())) {
+            downStation = section.getDownStation();
+            return true;
+        }
+        return false;
+    }
+
+    private boolean changeUpStation(Section section) {
+        if (upStation.isSame(section.getDownStation())) {
+            upStation = section.getUpStation();
+            return true;
+        }
+        return false;
+    }
+
+    private void mergeDistance(Section section) {
+        this.distance.extend(section.getDistance());
+    }
+
     public int getDistance() {
         return distance.get();
     }

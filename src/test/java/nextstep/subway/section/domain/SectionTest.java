@@ -160,4 +160,46 @@ class SectionTest {
         // then
         assertThatThrownBy(throwingCallable).isInstanceOf(IllegalArgumentException.class);
     }
+
+    @DisplayName("연결된 두 구간을 합치면 상행역과 하행역을 재배치하고 구간의 길이를 합한다.")
+    @Test
+    void mergeSection() {
+        // given
+        Station upStation = Station.of(1L, "상행역");
+        Station middleStation = Station.of(2L, "중간역");
+        Station downStation = Station.of(3L, "하행역");
+        Section section = Section.of(upStation, middleStation, 5);
+        Section deleteSection = Section.of(middleStation, downStation, 4);
+
+        // when
+        section.mergeSection(deleteSection);
+
+        // then
+        assertThat(section.getUpStation()).isEqualTo(upStation);
+        assertThat(section.getDownStation()).isEqualTo(downStation);
+        assertThat(section.getDistance()).isEqualTo(9);
+    }
+
+    @DisplayName("연결되지 않은 두 구간을 합치면 변경되지 않는다.")
+    @Test
+    void notExtendDistance() {
+        // given
+        Station upStation = Station.of(1L, "상행역");
+        Station downStation = Station.of(2L, "하행역");
+        Station otherUpStation = Station.of(3L, "다른상행역");
+        Station otherDownStation = Station.of(4L, "다른하행역");
+        Section section = Section.of(upStation, downStation, 5);
+        Section deleteSection = Section.of(otherUpStation, otherDownStation, 4);
+
+        // when
+        section.mergeSection(deleteSection);
+
+        // then
+        assertThat(section.getUpStation()).isEqualTo(upStation);
+        assertThat(section.getDownStation()).isEqualTo(downStation);
+        assertThat(section.getDistance()).isEqualTo(5);
+        assertThat(deleteSection.getUpStation()).isEqualTo(otherUpStation);
+        assertThat(deleteSection.getDownStation()).isEqualTo(otherDownStation);
+        assertThat(deleteSection.getDistance()).isEqualTo(4);
+    }
 }
