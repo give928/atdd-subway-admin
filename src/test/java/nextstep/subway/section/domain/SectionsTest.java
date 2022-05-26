@@ -107,4 +107,44 @@ class SectionsTest {
         // then
         assertThatThrownBy(throwingCallable).isInstanceOf(IllegalArgumentException.class);
     }
+
+    @DisplayName("종점역을 제거한다.")
+    @ParameterizedTest(name = "{displayName} station={0}")
+    @CsvSource({"상행역", "하행역"})
+    void removeLastSection(Station station) {
+        // when
+        boolean result = sections.remove(station);
+
+        // then
+        assertThat(result).isTrue();
+        assertThat(sections.getStations()).allMatch(s -> !s.isSame(station));
+    }
+
+    @DisplayName("중간역을 제거하면 구간이 제거되고 연결된 구간의 거리가 늘어난다.")
+    @Test
+    void removeMiddleSection() {
+        // when
+        boolean result = sections.remove(중간역);
+
+        // then
+        assertThat(result).isTrue();
+        assertThat(sections.getStations()).allMatch(s -> !s.isSame(중간역));
+        Section section = 중간하행구간;
+        if (!상행중간구간.getUpStation().isSame(중간역) && !상행중간구간.getDownStation().isSame(중간역)) {
+            section = 상행중간구간;
+        }
+        assertThat(section.getUpStation()).isEqualTo(상행역);
+        assertThat(section.getDownStation()).isEqualTo(하행역);
+        assertThat(section.getDistance()).isEqualTo(20);
+    }
+
+    @DisplayName("등록되지 않은 역을 제거할 수 없다.")
+    @Test
+    void thrownByNotExistsStation() {
+        // when
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> sections.remove(Station.of(9999L, "테스트"));
+
+        // then
+        assertThatThrownBy(throwingCallable).isInstanceOf(IllegalArgumentException.class);
+    }
 }
