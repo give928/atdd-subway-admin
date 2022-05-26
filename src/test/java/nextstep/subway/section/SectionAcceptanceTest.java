@@ -219,8 +219,10 @@ class SectionAcceptanceTest extends BaseAcceptanceTest {
     @Test
     void deleteNotExistsStation() {
         // when
+        ExtractableResponse<Response> response = RestUtils.delete(SECTION_URL + "?stationId=9999");
 
         // then
+        assertResponseStatus(response, HttpStatus.BAD_REQUEST);
     }
 
     /**
