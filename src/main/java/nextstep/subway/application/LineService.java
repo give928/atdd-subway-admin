@@ -1,12 +1,10 @@
 package nextstep.subway.application;
 
-import nextstep.subway.domain.Line;
-import nextstep.subway.domain.LineRepository;
-import nextstep.subway.domain.Station;
-import nextstep.subway.domain.StationRepository;
+import nextstep.subway.domain.*;
 import nextstep.subway.dto.LineSaveRequest;
 import nextstep.subway.dto.LineResponse;
 import nextstep.subway.dto.LineUpdateRequest;
+import nextstep.subway.dto.SectionRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,10 +25,8 @@ public class LineService {
 
     @Transactional
     public LineResponse save(LineSaveRequest lineSaveRequest) {
-        Station upStation = stationRepository.findById(lineSaveRequest.getUpStationId())
-                .orElseThrow(EntityNotFoundException::new);
-        Station downStation = stationRepository.findById(lineSaveRequest.getDownStationId())
-                .orElseThrow(EntityNotFoundException::new);
+        Station upStation = findStation(lineSaveRequest.getUpStationId());
+        Station downStation = findStation(lineSaveRequest.getDownStationId());
 
         Line persistLine = lineRepository.save(lineSaveRequest.toLine(upStation, downStation));
 
@@ -61,5 +57,20 @@ public class LineService {
     @Transactional
     public void delete(Long id) {
         lineRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void addSection(Long id, SectionRequest sectionRequest) {
+        Station upStation = findStation(sectionRequest.getUpStationId());
+        Station downStation = findStation(sectionRequest.getDownStationId());
+        Section section = new Section(upStation, downStation, sectionRequest.getDistance());
+        Line line = lineRepository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+        line.addSection(section);
+    }
+
+    private Station findStation(Long stationId) {
+        return stationRepository.findById(stationId)
+                .orElseThrow(EntityNotFoundException::new);
     }
 }
