@@ -73,4 +73,12 @@ public class LineService {
         return stationRepository.findById(stationId)
                 .orElseThrow(EntityNotFoundException::new);
     }
+
+    @Transactional
+    public void removeSection(Long id, Long stationId) {
+        Station station = findStation(stationId);
+        Line line = lineRepository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+        line.removeSection(station);
+    }
 }
