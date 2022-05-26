@@ -55,8 +55,11 @@ class SectionsTest {
     @DisplayName("새로운 역을 상행 종점으로 등록한다.")
     @Test
     void addUpSection() {
+        // given
+        Station 새로운상행역 = Station.of(5L, "새로운상행역");
+
         // when
-        boolean result = sections.add(Section.of(새로운역, 상행역, 9));
+        boolean result = sections.add(Section.of(새로운상행역, 상행역, 9));
 
         // then
         assertThat(result).isTrue();
@@ -65,8 +68,11 @@ class SectionsTest {
     @DisplayName("새로운 역을 하행 종점으로 등록한다.")
     @Test
     void addDownSection() {
+        // given
+        Station 새로운하행역 = Station.of(5L, "새로운하행역");
+
         // when
-        boolean result = sections.add(Section.of(하행역, 새로운역, 9));
+        boolean result = sections.add(Section.of(하행역, 새로운하행역, 9));
 
         // then
         assertThat(result).isTrue();

@@ -25,8 +25,8 @@ class SectionTest {
     @Test
     void createSection() {
         // given
-        Station upStation = Station.of(1L, "지하철역");
-        Station downStation = Station.of(2L, "새로운지하철역");
+        Station upStation = Station.of(1L, "상행역");
+        Station downStation = Station.of(2L, "하행역");
 
         // when
         Section section = Section.of(upStation, downStation, 1);
@@ -51,8 +51,8 @@ class SectionTest {
     @Test
     void thrownByNotPositiveDistance() {
         // given
-        Station upStation = Station.of(1L, "지하철역");
-        Station downStation = Station.of(2L, "새로운지하철역");
+        Station upStation = Station.of(1L, "상행역");
+        Station downStation = Station.of(2L, "하행역");
 
         // when
         ThrowableAssert.ThrowingCallable throwingCallable = () -> Section.of(upStation , downStation, 0);
@@ -65,11 +65,11 @@ class SectionTest {
     @Test
     void isUpLinkable() {
         // given
-        Station upStation = Station.of(1L, "지하철역");
-        Station downStation = Station.of(2L, "새로운지하철역");
+        Station upStation = Station.of(1L, "상행역");
+        Station downStation = Station.of(2L, "하행역");
         Section section = Section.of(upStation, downStation, 5);
 
-        Station linkStation = Station.of(3L, "다른새로운지하철역");
+        Station linkStation = Station.of(3L, "새로운상행역");
 
         // when
         boolean actual = section.isLinkable(Section.of(linkStation, upStation, 5));
@@ -82,11 +82,11 @@ class SectionTest {
     @Test
     void isDownLinkable() {
         // given
-        Station upStation = Station.of(1L, "지하철역");
-        Station downStation = Station.of(2L, "새로운지하철역");
+        Station upStation = Station.of(1L, "상행역");
+        Station downStation = Station.of(2L, "하행역");
         Section section = Section.of(upStation, downStation, 5);
 
-        Station linkStation = Station.of(3L, "다른새로운지하철역");
+        Station linkStation = Station.of(3L, "새로운하행역");
 
         // when
         boolean actual = section.isLinkable(Section.of(downStation, linkStation, 5));
@@ -99,11 +99,11 @@ class SectionTest {
     @Test
     void isInnerLinkable() {
         // given
-        Station upStation = Station.of(1L, "지하철역");
-        Station downStation = Station.of(2L, "새로운지하철역");
+        Station upStation = Station.of(1L, "상행역");
+        Station downStation = Station.of(2L, "하행역");
         Section section = Section.of(upStation, downStation, 5);
 
-        Station linkStation = Station.of(3L, "다른새로운지하철역");
+        Station linkStation = Station.of(3L, "중간역");
 
         // when
         boolean actual = section.isLinkable(Section.of(upStation, linkStation, 4));
@@ -116,8 +116,8 @@ class SectionTest {
     @Test
     void thrownByDuplicatedStations() {
         // given
-        Station upStation = Station.of(1L, "지하철역");
-        Station downStation = Station.of(2L, "새로운지하철역");
+        Station upStation = Station.of(1L, "상행역");
+        Station downStation = Station.of(2L, "하행역");
         Section section = Section.of(upStation, downStation, 5);
 
         // when
@@ -132,10 +132,10 @@ class SectionTest {
     @Test
     void reduceDistance() {
         // given
-        Station upStation = Station.of(1L, "지하철역");
-        Station downStation = Station.of(2L, "새로운지하철역");
+        Station upStation = Station.of(1L, "상행역");
+        Station downStation = Station.of(2L, "하행역");
         Section linkSection = Section.of(upStation, downStation, 5);
-        Section section = Section.of(upStation, Station.of(3L, "다른지하철역"), 4);
+        Section section = Section.of(upStation, Station.of(3L, "중간역"), 4);
 
         // when
         linkSection.reduceDistance(section);
@@ -149,10 +149,10 @@ class SectionTest {
     @Test
     void thrownByOverflowDistance() {
         // given
-        Station upStation = Station.of(1L, "지하철역");
-        Station downStation = Station.of(2L, "새로운지하철역");
+        Station upStation = Station.of(1L, "상행역");
+        Station downStation = Station.of(2L, "하행역");
         Section linkSection = Section.of(upStation, downStation, 5);
-        Section section = Section.of(upStation, Station.of(3L, "다른지하철역"), 5);
+        Section section = Section.of(upStation, Station.of(3L, "중간역"), 5);
 
         // when
         ThrowableAssert.ThrowingCallable throwingCallable = () -> linkSection.reduceDistance(section);
