@@ -21,7 +21,9 @@ public class Sections {
     }
 
     public boolean add(Section section) {
-        reduceLinkSection(section);
+        if (!values.isEmpty()) {
+            reduceLinkSection(section);
+        }
         return this.values.add(section);
     }
 
