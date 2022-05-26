@@ -37,7 +37,12 @@ public class Distance {
             throw new IllegalArgumentException(ErrorMessages.CAN_NOT_ADD_OVERFLOW_DISTANCE);
         }
         this.value = updateValue;
-        return updateValue;
+        return this.value;
+    }
+
+    public int extend(int distance) {
+        this.value += distance;
+        return this.value;
     }
 
     public int get() {
