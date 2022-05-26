@@ -11,13 +11,18 @@ import java.util.stream.Stream;
 @Embeddable
 public class Sections {
     @OneToMany(mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Section> values = new ArrayList<>();
+    private List<Section> values;
 
     protected Sections() {
+        this.values = new ArrayList<>();
     }
 
-    public Sections(List<Section> sections) {
+    private Sections(List<Section> sections) {
         this.values = sections;
+    }
+
+    public static Sections of(List<Section> sections) {
+        return new Sections(sections);
     }
 
     public boolean add(Section section) {

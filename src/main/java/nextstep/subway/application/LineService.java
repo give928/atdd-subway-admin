@@ -63,7 +63,7 @@ public class LineService {
     public void addSection(Long id, SectionRequest sectionRequest) {
         Station upStation = findStation(sectionRequest.getUpStationId());
         Station downStation = findStation(sectionRequest.getDownStationId());
-        Section section = new Section(upStation, downStation, sectionRequest.getDistance());
+        Section section = Section.of(upStation, downStation, sectionRequest.getDistance());
         Line line = lineRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
         line.addSection(section);

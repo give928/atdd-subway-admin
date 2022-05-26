@@ -26,11 +26,11 @@ class LineTest {
     @Test
     void createLine() {
         // given
-        Station upStation = new Station(1L, "지하철역");
-        Station downStation = new Station(2L, "새로운지하철역");
+        Station upStation = Station.of(1L, "지하철역");
+        Station downStation = Station.of(2L, "새로운지하철역");
 
         // when
-        Line line = new Line("신분당선", "bg-red-600", upStation, downStation, 10);
+        Line line = Line.of("신분당선", "bg-red-600", upStation, downStation, 10);
 
         // then
         assertThat(line.getStations()).containsExactly(upStation, downStation);
@@ -41,11 +41,11 @@ class LineTest {
     @MethodSource(value = "thrownByEmptyNameOrColorParameter")
     void thrownByHasNotNameOrColor(String name, String color) {
         // given
-        Station upStation = new Station(1L, "지하철역");
-        Station downStation = new Station(2L, "새로운지하철역");
+        Station upStation = Station.of(1L, "지하철역");
+        Station downStation = Station.of(2L, "새로운지하철역");
 
         // when
-        ThrowableAssert.ThrowingCallable throwingCallable = () -> new Line(name, color, upStation, downStation, 1);
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> Line.of(name, color, upStation, downStation, 1);
 
         // then
         assertThatThrownBy(throwingCallable).isInstanceOf(IllegalArgumentException.class);
@@ -55,9 +55,9 @@ class LineTest {
     @Test
     void updateLine() {
         // given
-        Station upStation = new Station(1L, "지하철역");
-        Station downStation = new Station(2L, "새로운지하철역");
-        Line line = new Line("신분당선", "bg-red-600", upStation, downStation, 10);
+        Station upStation = Station.of(1L, "지하철역");
+        Station downStation = Station.of(2L, "새로운지하철역");
+        Line line = Line.of("신분당선", "bg-red-600", upStation, downStation, 10);
 
         // when
         Line updatedLine = line.update("분당선", "bg-green-600");

@@ -28,13 +28,13 @@ class SectionsTest {
 
     @BeforeEach
     void setUp() {
-        상행역 = new Station(1L, "상행역");
-        중간역 = new Station(2L, "중간역");
-        하행역 = new Station(3L, "하행역");
-        새로운역 = new Station(4L, "새로운역");
-        상행중간구간 = new Section(상행역, 중간역, 10);
-        중간하행구간 = new Section(중간역, 하행역, 10);
-        sections = new Sections(new ArrayList<>(Arrays.asList(상행중간구간, 중간하행구간)));
+        상행역 = Station.of(1L, "상행역");
+        중간역 = Station.of(2L, "중간역");
+        하행역 = Station.of(3L, "하행역");
+        새로운역 = Station.of(4L, "새로운역");
+        상행중간구간 = Section.of(상행역, 중간역, 10);
+        중간하행구간 = Section.of(중간역, 하행역, 10);
+        sections = Sections.of(new ArrayList<>(Arrays.asList(상행중간구간, 중간하행구간)));
     }
 
     @DisplayName("역 사이에 새로운 역 구간을 추가하면, 새로운 구간이 추가되고, 기존 구간의 거리가 새로운 길이를 뺀 나머지로 변경된다.")
@@ -43,7 +43,7 @@ class SectionsTest {
             "새로운역, 하행역, '기존하행역과 중간역 사이에 새로운역을 추가'"})
     void insertSection(Station 추가상행역, Station 추가하행역, String message) {
         // when
-        boolean result = sections.add(new Section(추가상행역, 추가하행역, 9));
+        boolean result = sections.add(Section.of(추가상행역, 추가하행역, 9));
 
         // then
         assertThat(result).isTrue();
@@ -56,7 +56,7 @@ class SectionsTest {
     @Test
     void addUpSection() {
         // when
-        boolean result = sections.add(new Section(새로운역, 상행역, 9));
+        boolean result = sections.add(Section.of(새로운역, 상행역, 9));
 
         // then
         assertThat(result).isTrue();
@@ -66,7 +66,7 @@ class SectionsTest {
     @Test
     void addDownSection() {
         // when
-        boolean result = sections.add(new Section(하행역, 새로운역, 9));
+        boolean result = sections.add(Section.of(하행역, 새로운역, 9));
 
         // then
         assertThat(result).isTrue();
@@ -77,7 +77,7 @@ class SectionsTest {
     @CsvSource({"상행역, 새로운역, 기존상행역과 중간역 사이에 새로운역을 추가", "새로운역, 하행역, 기존하행역과 중간역 사이에 새로운역을 추가"})
     void thrownByOverflowDistance(Station 추가상행역, Station 추가하행역, String message) {
         // when
-        ThrowableAssert.ThrowingCallable throwingCallable = () -> sections.add(new Section(추가상행역, 추가하행역, 10));
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> sections.add(Section.of(추가상행역, 추가하행역, 10));
 
         // then
         assertThatThrownBy(throwingCallable).isInstanceOf(IllegalArgumentException.class);
@@ -88,7 +88,7 @@ class SectionsTest {
     @CsvSource({"상행역, 중간역, 1구간 동일한 역으로 추가", "상행역, 하행역, 2구간 동일한 역으로 추가"})
     void thrownByDuplicatedStations(Station 추가상행역, Station 추가하행역, String message) {
         // when
-        ThrowableAssert.ThrowingCallable throwingCallable = () -> sections.add(new Section(추가상행역, 추가하행역, 5));
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> sections.add(Section.of(추가상행역, 추가하행역, 5));
 
         // then
         assertThatThrownBy(throwingCallable).isInstanceOf(IllegalArgumentException.class);
@@ -98,11 +98,11 @@ class SectionsTest {
     @Test
     void thrownByIsolatedStations() {
         // given
-        Station 새로운상행역 = new Station(10L, "새로운상행역");
-        Station 새로운하행역 = new Station(11L, "새로운하행역");
+        Station 새로운상행역 = Station.of(10L, "새로운상행역");
+        Station 새로운하행역 = Station.of(11L, "새로운하행역");
 
         // when
-        ThrowableAssert.ThrowingCallable throwingCallable = () -> sections.add(new Section(새로운상행역, 새로운하행역, 5));
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> sections.add(Section.of(새로운상행역, 새로운하행역, 5));
 
         // then
         assertThatThrownBy(throwingCallable).isInstanceOf(IllegalArgumentException.class);

@@ -20,15 +20,15 @@ public class Distance {
     }
 
     public static Distance of(int value) {
-        validateDistance(value);
-        return new Distance(value);
+        return new Distance(validateIfDistance(value));
     }
 
-    private static void validateDistance(int value) {
+    private static int validateIfDistance(int value) {
         if (value < MIN_DISTANCE) {
             throw new IllegalArgumentException(
                     String.format(ErrorMessages.REQUIRED_GREATER_THAN_OR_EQUAL_TO_SECTION_DISTANCE, MIN_DISTANCE));
         }
+        return value;
     }
 
     public int reduce(int distance) {

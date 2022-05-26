@@ -22,10 +22,10 @@ class StationTest {
     @Test
     void createSection() {
         // when
-        Station station = new Station(1L, "지하철역");
+        Station station = Station.of(1L, "지하철역");
 
         // then
-        assertThat(station).isEqualTo(new Station(1L, "지하철역"));
+        assertThat(station).isEqualTo(Station.of(1L, "지하철역"));
     }
 
     @DisplayName("이름에 값이 없으면 IllegalArgumentException 이 발생한다.")
@@ -35,7 +35,7 @@ class StationTest {
         // given
 
         // when
-        ThrowableAssert.ThrowingCallable throwingCallable = () -> new Station(name);
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> Station.of(name);
 
         // then
         assertThatThrownBy(throwingCallable).isInstanceOf(IllegalArgumentException.class);

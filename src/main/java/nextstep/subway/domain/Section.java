@@ -27,14 +27,18 @@ public class Section extends BaseEntity {
     protected Section() {
     }
 
-    public Section(Station upStation, Station downStation, int distance) {
-        validateStation(upStation, downStation);
+    private Section(Station upStation, Station downStation, Distance distance) {
         this.upStation = upStation;
         this.downStation = downStation;
-        this.distance = Distance.of(distance);
+        this.distance = distance;
     }
 
-    private void validateStation(Station upStation, Station downStation) {
+    public static Section of(Station upStation, Station downStation, int distance) {
+        validateStation(upStation, downStation);
+        return new Section(upStation, downStation, Distance.of(distance));
+    }
+
+    private static void validateStation(Station upStation, Station downStation) {
         if (upStation == null) {
             throw new IllegalArgumentException(ErrorMessages.REQUIRED_SECTION_UP_STATION);
         }

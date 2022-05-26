@@ -17,19 +17,19 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @DisplayName("지하철구간 관련 기능")
 class SectionTest {
     public static Stream<Arguments> thrownByNullOrSameStationParameter() {
-        return Stream.of(Arguments.of(null, new Station(1L, "지하철역")), Arguments.of(new Station(1L, "지하철역"), null),
-                         Arguments.of(null, null), Arguments.of(new Station(1L, "지하철역"), new Station(1L, "지하철역")));
+        return Stream.of(Arguments.of(null, Station.of(1L, "지하철역")), Arguments.of(Station.of(1L, "지하철역"), null),
+                         Arguments.of(null, null), Arguments.of(Station.of(1L, "지하철역"), Station.of(1L, "지하철역")));
     }
 
     @DisplayName("지하철구간을 생성한다.")
     @Test
     void createSection() {
         // given
-        Station upStation = new Station(1L, "지하철역");
-        Station downStation = new Station(2L, "새로운지하철역");
+        Station upStation = Station.of(1L, "지하철역");
+        Station downStation = Station.of(2L, "새로운지하철역");
 
         // when
-        Section section = new Section(upStation, downStation, 1);
+        Section section = Section.of(upStation, downStation, 1);
 
         // then
         assertThat(section.getUpStation()).isEqualTo(upStation);
@@ -41,7 +41,7 @@ class SectionTest {
     @MethodSource(value = "thrownByNullOrSameStationParameter")
     void thrownByNullOrSameStation(Station upStation, Station downStation) {
         // when
-        ThrowableAssert.ThrowingCallable throwingCallable = () -> new Section(upStation, downStation, 1);
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> Section.of(upStation, downStation, 1);
 
         // then
         assertThatThrownBy(throwingCallable).isInstanceOf(IllegalArgumentException.class);
@@ -51,11 +51,11 @@ class SectionTest {
     @Test
     void thrownByNotPositiveDistance() {
         // given
-        Station upStation = new Station(1L, "지하철역");
-        Station downStation = new Station(2L, "새로운지하철역");
+        Station upStation = Station.of(1L, "지하철역");
+        Station downStation = Station.of(2L, "새로운지하철역");
 
         // when
-        ThrowableAssert.ThrowingCallable throwingCallable = () -> new Section(upStation , downStation, 0);
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> Section.of(upStation , downStation, 0);
 
         // then
         assertThatThrownBy(throwingCallable).isInstanceOf(IllegalArgumentException.class);
@@ -65,14 +65,14 @@ class SectionTest {
     @Test
     void isUpLinkable() {
         // given
-        Station upStation = new Station(1L, "지하철역");
-        Station downStation = new Station(2L, "새로운지하철역");
-        Section section = new Section(upStation, downStation, 5);
+        Station upStation = Station.of(1L, "지하철역");
+        Station downStation = Station.of(2L, "새로운지하철역");
+        Section section = Section.of(upStation, downStation, 5);
 
-        Station linkStation = new Station(3L, "다른새로운지하철역");
+        Station linkStation = Station.of(3L, "다른새로운지하철역");
 
         // when
-        boolean actual = section.isLinkable(new Section(linkStation, upStation, 5));
+        boolean actual = section.isLinkable(Section.of(linkStation, upStation, 5));
 
         // then
         assertThat(actual).isTrue();
@@ -82,14 +82,14 @@ class SectionTest {
     @Test
     void isDownLinkable() {
         // given
-        Station upStation = new Station(1L, "지하철역");
-        Station downStation = new Station(2L, "새로운지하철역");
-        Section section = new Section(upStation, downStation, 5);
+        Station upStation = Station.of(1L, "지하철역");
+        Station downStation = Station.of(2L, "새로운지하철역");
+        Section section = Section.of(upStation, downStation, 5);
 
-        Station linkStation = new Station(3L, "다른새로운지하철역");
+        Station linkStation = Station.of(3L, "다른새로운지하철역");
 
         // when
-        boolean actual = section.isLinkable(new Section(downStation, linkStation, 5));
+        boolean actual = section.isLinkable(Section.of(downStation, linkStation, 5));
 
         // then
         assertThat(actual).isTrue();
@@ -99,14 +99,14 @@ class SectionTest {
     @Test
     void isInnerLinkable() {
         // given
-        Station upStation = new Station(1L, "지하철역");
-        Station downStation = new Station(2L, "새로운지하철역");
-        Section section = new Section(upStation, downStation, 5);
+        Station upStation = Station.of(1L, "지하철역");
+        Station downStation = Station.of(2L, "새로운지하철역");
+        Section section = Section.of(upStation, downStation, 5);
 
-        Station linkStation = new Station(3L, "다른새로운지하철역");
+        Station linkStation = Station.of(3L, "다른새로운지하철역");
 
         // when
-        boolean actual = section.isLinkable(new Section(upStation, linkStation, 4));
+        boolean actual = section.isLinkable(Section.of(upStation, linkStation, 4));
 
         // then
         assertThat(actual).isTrue();
@@ -116,13 +116,13 @@ class SectionTest {
     @Test
     void thrownByDuplicatedStations() {
         // given
-        Station upStation = new Station(1L, "지하철역");
-        Station downStation = new Station(2L, "새로운지하철역");
-        Section section = new Section(upStation, downStation, 5);
+        Station upStation = Station.of(1L, "지하철역");
+        Station downStation = Station.of(2L, "새로운지하철역");
+        Section section = Section.of(upStation, downStation, 5);
 
         // when
         ThrowableAssert.ThrowingCallable throwingCallable = () -> section.isLinkable(
-                new Section(upStation, downStation, 4));
+                Section.of(upStation, downStation, 4));
 
         // then
         assertThatThrownBy(throwingCallable).isInstanceOf(IllegalArgumentException.class);
@@ -132,10 +132,10 @@ class SectionTest {
     @Test
     void reduceDistance() {
         // given
-        Station upStation = new Station(1L, "지하철역");
-        Station downStation = new Station(2L, "새로운지하철역");
-        Section linkSection = new Section(upStation, downStation, 5);
-        Section section = new Section(upStation, new Station(3L, "다른지하철역"), 4);
+        Station upStation = Station.of(1L, "지하철역");
+        Station downStation = Station.of(2L, "새로운지하철역");
+        Section linkSection = Section.of(upStation, downStation, 5);
+        Section section = Section.of(upStation, Station.of(3L, "다른지하철역"), 4);
 
         // when
         linkSection.reduceDistance(section);
@@ -149,10 +149,10 @@ class SectionTest {
     @Test
     void thrownByOverflowDistance() {
         // given
-        Station upStation = new Station(1L, "지하철역");
-        Station downStation = new Station(2L, "새로운지하철역");
-        Section linkSection = new Section(upStation, downStation, 5);
-        Section section = new Section(upStation, new Station(3L, "다른지하철역"), 5);
+        Station upStation = Station.of(1L, "지하철역");
+        Station downStation = Station.of(2L, "새로운지하철역");
+        Section linkSection = Section.of(upStation, downStation, 5);
+        Section section = Section.of(upStation, Station.of(3L, "다른지하철역"), 5);
 
         // when
         ThrowableAssert.ThrowingCallable throwingCallable = () -> linkSection.reduceDistance(section);
