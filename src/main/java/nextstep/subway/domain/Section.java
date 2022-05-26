@@ -41,7 +41,7 @@ public class Section extends BaseEntity {
         if (downStation == null) {
             throw new IllegalArgumentException(ErrorMessages.REQUIRED_SECTION_DOWN_STATION);
         }
-        if (upStation.isSameStation(downStation)) {
+        if (upStation.isSame(downStation)) {
             throw new IllegalArgumentException(ErrorMessages.REQUIRED_DIFFERENT_SECTION_STATIONS);
         }
     }
@@ -62,12 +62,38 @@ public class Section extends BaseEntity {
         return downStation;
     }
 
+    public void reduceDistance(Section section) {
+        if (isInner(section)) {
+            this.distance.reduce(section.getDistance());
+        }
+    }
+
     public int getDistance() {
         return distance.get();
     }
 
     public Line getLine() {
         return line;
+    }
+
+    public boolean isLinkable(Section section) {
+        if (isInner(section)) {
+            return true;
+        }
+        return isOuter(section);
+    }
+
+    private boolean isInner(Section section) {
+        boolean sameUpStation = upStation.isSame(section.getUpStation());
+        boolean sameDownStation = downStation.isSame(section.getDownStation());
+        if (sameUpStation && sameDownStation) {
+            throw new IllegalArgumentException(ErrorMessages.CAN_NOT_ADD_DUPLICATED_STATIONS);
+        }
+        return sameUpStation || sameDownStation;
+    }
+
+    private boolean isOuter(Section section) {
+        return upStation.isSame(section.getDownStation()) || downStation.isSame(section.getUpStation());
     }
 
     @Override
@@ -85,6 +111,7 @@ public class Section extends BaseEntity {
         private static final String REQUIRED_SECTION_UP_STATION = "지하철구간의 상행 지하철역은 필수입니다.";
         private static final String REQUIRED_SECTION_DOWN_STATION = "지하철구간의 하행 지하철역은 필수입니다.";
         private static final String REQUIRED_DIFFERENT_SECTION_STATIONS = "지하철구간의 상행 지하철역과 하행 지하철역을 하나의 역으로 지정할 수 없습니다.";
+        private static final String CAN_NOT_ADD_DUPLICATED_STATIONS = "상행역과 하행역이 이미 노선에 모두 등록되어 있어서 추가할 수 없습니다.";
 
         private ErrorMessages() {
         }

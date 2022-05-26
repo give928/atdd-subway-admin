@@ -40,7 +40,7 @@ public class Station extends BaseEntity {
         return name;
     }
 
-    public boolean isSameStation(Station station) {
+    public boolean isSame(Station station) {
         if (isSameStationId(station)) {
             return true;
         }

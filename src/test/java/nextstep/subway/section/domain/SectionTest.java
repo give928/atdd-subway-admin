@@ -40,8 +40,6 @@ class SectionTest {
     @ParameterizedTest(name = "{displayName} upStation={0}, downStation={1}")
     @MethodSource(value = "thrownByNullOrSameStationParameter")
     void thrownByNullOrSameStation(Station upStation, Station downStation) {
-        // given
-
         // when
         ThrowableAssert.ThrowingCallable throwingCallable = () -> new Section(upStation, downStation, 1);
 
@@ -58,6 +56,106 @@ class SectionTest {
 
         // when
         ThrowableAssert.ThrowingCallable throwingCallable = () -> new Section(upStation , downStation, 0);
+
+        // then
+        assertThatThrownBy(throwingCallable).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("상행 종점 구간이 추가 가능한지 확인한다.")
+    @Test
+    void isUpLinkable() {
+        // given
+        Station upStation = new Station(1L, "지하철역");
+        Station downStation = new Station(2L, "새로운지하철역");
+        Section section = new Section(upStation, downStation, 5);
+
+        Station linkStation = new Station(3L, "다른새로운지하철역");
+
+        // when
+        boolean actual = section.isLinkable(new Section(linkStation, upStation, 5));
+
+        // then
+        assertThat(actual).isTrue();
+    }
+
+    @DisplayName("하행 종점 구간이 추가 가능한지 확인한다.")
+    @Test
+    void isDownLinkable() {
+        // given
+        Station upStation = new Station(1L, "지하철역");
+        Station downStation = new Station(2L, "새로운지하철역");
+        Section section = new Section(upStation, downStation, 5);
+
+        Station linkStation = new Station(3L, "다른새로운지하철역");
+
+        // when
+        boolean actual = section.isLinkable(new Section(downStation, linkStation, 5));
+
+        // then
+        assertThat(actual).isTrue();
+    }
+
+    @DisplayName("역 사이에 새로운 구간이 추가 가능한지 확인한다.")
+    @Test
+    void isInnerLinkable() {
+        // given
+        Station upStation = new Station(1L, "지하철역");
+        Station downStation = new Station(2L, "새로운지하철역");
+        Section section = new Section(upStation, downStation, 5);
+
+        Station linkStation = new Station(3L, "다른새로운지하철역");
+
+        // when
+        boolean actual = section.isLinkable(new Section(upStation, linkStation, 4));
+
+        // then
+        assertThat(actual).isTrue();
+    }
+
+    @DisplayName("상행역과 하행역이 이미 노선에 모두 등록되어 있다면 추가할 수 없다.")
+    @Test
+    void thrownByDuplicatedStations() {
+        // given
+        Station upStation = new Station(1L, "지하철역");
+        Station downStation = new Station(2L, "새로운지하철역");
+        Section section = new Section(upStation, downStation, 5);
+
+        // when
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> section.isLinkable(
+                new Section(upStation, downStation, 4));
+
+        // then
+        assertThatThrownBy(throwingCallable).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("역 사이에 새로운 역 구간을 추가하면 기존 구간의 거리가 새로운 길이를 뺀 나머지로 변경된다.")
+    @Test
+    void reduceDistance() {
+        // given
+        Station upStation = new Station(1L, "지하철역");
+        Station downStation = new Station(2L, "새로운지하철역");
+        Section linkSection = new Section(upStation, downStation, 5);
+        Section section = new Section(upStation, new Station(3L, "다른지하철역"), 4);
+
+        // when
+        linkSection.reduceDistance(section);
+
+        // then
+        assertThat(linkSection.getDistance()).isEqualTo(1);
+        assertThat(section.getDistance()).isEqualTo(4);
+    }
+
+    @DisplayName("기존 구간의 거리보다 새로운 길이가 길거나 같으면 예외가 발생한다.")
+    @Test
+    void thrownByOverflowDistance() {
+        // given
+        Station upStation = new Station(1L, "지하철역");
+        Station downStation = new Station(2L, "새로운지하철역");
+        Section linkSection = new Section(upStation, downStation, 5);
+        Section section = new Section(upStation, new Station(3L, "다른지하철역"), 5);
+
+        // when
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> linkSection.reduceDistance(section);
 
         // then
         assertThatThrownBy(throwingCallable).isInstanceOf(IllegalArgumentException.class);
