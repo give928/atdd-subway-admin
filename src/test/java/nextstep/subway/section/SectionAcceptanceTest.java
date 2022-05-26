@@ -22,8 +22,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철구간 관련 기능")
 class SectionAcceptanceTest extends BaseAcceptanceTest {
-    private static final String 신분당선 = "신분당선";
-
     @Autowired
     private SectionRepository sectionRepository;
 
@@ -154,6 +152,67 @@ class SectionAcceptanceTest extends BaseAcceptanceTest {
 
         // then
         지하철구간_등록_안됨(response);
+    }
+
+    /**
+     * Given 지하철 구간을 3개 등록하고
+     * When 종점을 제거하면
+     * Then 구간이 제거되고
+     * Then 이전 구간의 역이 종점이 된다.
+     */
+    @DisplayName("종점역을 제거한다.")
+    @Test
+    void deleteLastStation() {
+        // given
+
+        // when
+
+        // then
+
+        // then
+    }
+
+    /**
+     * Given 지하철 구간을 3개 등록하고
+     * When 중간역을 제거하면
+     * Then 구간이 제거되고
+     * Then 제거된 구간의 남은 역이 이전 구간의 역으로 재배치 되고 거리는 두 구간의 합이 된다.
+     */
+    @DisplayName("중간역을 제거한다.")
+    @Test
+    void deleteMiddleStation() {
+        // given
+
+        // when
+
+        // then
+
+        // then
+    }
+
+    /**
+     * When 등록되어 있지 않은 역을 제거하면
+     * Then 제거되지 않는다.
+     */
+    @DisplayName("등록되지 않은 역은 제거되지 않는다.")
+    @Test
+    void deleteNotExistsStation() {
+        // when
+
+        // then
+    }
+
+    /**
+     * Given 지하철 구간을 1개 등록하고
+     * When 역을 제거하면
+     * Then 제거되지 않는다.
+     */
+    @DisplayName("노선에 1개의 구간만 있으면 제거되지 않는다.")
+    @Test
+    void deleteOnlyOneSectionStation() {
+        // when
+
+        // then
     }
 
     private ExtractableResponse<Response> 지하철구간_등록_요청(long upStationId, long downStationId, int distance) {
