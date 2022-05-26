@@ -145,6 +145,6 @@ public ResponseEntity addSection(
     - 참고한 코드에서는 LineStation을 일급컬렉션을 묶어 LineStations로 둠
     - [JPA @Embedded And @Embeddable](https://www.baeldung.com/jpa-embedded-embeddable) 을 참고하세요.
 
-## 기능 구현 목록
-- [ ] 지하철 구간 추가 인수 테스트
-- [ ] 지하철 구간 추가 구현
+## 기능 목록
+- [x] 지하철 구간 추가 인수 테스트
+- [x] 지하철 구간 추가 구현
