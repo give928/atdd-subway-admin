@@ -72,7 +72,7 @@ public class Section extends BaseEntity {
         }
     }
 
-    public void mergeSection(Section section) {
+    public void merge(Section section) {
         if (isOuter(section)) {
             mergeStation(section);
             mergeDistance(section);

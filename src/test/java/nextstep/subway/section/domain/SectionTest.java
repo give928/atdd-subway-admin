@@ -172,7 +172,7 @@ class SectionTest {
         Section deleteSection = Section.of(middleStation, downStation, 4);
 
         // when
-        section.mergeSection(deleteSection);
+        section.merge(deleteSection);
 
         // then
         assertThat(section.getUpStation()).isEqualTo(upStation);
@@ -192,7 +192,7 @@ class SectionTest {
         Section deleteSection = Section.of(otherUpStation, otherDownStation, 4);
 
         // when
-        section.mergeSection(deleteSection);
+        section.merge(deleteSection);
 
         // then
         assertThat(section.getUpStation()).isEqualTo(upStation);
