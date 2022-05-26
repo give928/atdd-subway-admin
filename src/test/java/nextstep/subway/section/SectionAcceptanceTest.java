@@ -193,12 +193,22 @@ class SectionAcceptanceTest extends BaseAcceptanceTest {
     @Test
     void deleteMiddleStation() {
         // given
+        long 새로운상행역_id = RestUtils.id_추출(StationRestAssured.지하철역_생성_요청("새로운상행역"));
+        long 새로운하행역_id = RestUtils.id_추출(StationRestAssured.지하철역_생성_요청("새로운하행역"));
+        지하철구간_등록_요청(새로운상행역_id, 상행역_id, 20);
+        지하철구간_등록_요청(새로운하행역_id, 하행역_id, 30);
 
         // when
+        ExtractableResponse<Response> response = RestUtils.delete(SECTION_URL + "?stationId=" + 상행역_id);
 
         // then
+        assertResponseStatus(response, HttpStatus.OK);
 
         // then
+        List<Section> sections = sectionRepository.findAll();
+        assertThat(sections).hasSize(2)
+                .allMatch(section -> section.getUpStation().getId() != 상행역_id && section.getDownStation().getId() != 상행역_id)
+                .anyMatch(section -> section.getUpStation().getId() == 새로운상행역_id && section.getDownStation().getId() == 하행역_id && section.getDistance() == 30);
     }
 
     /**
