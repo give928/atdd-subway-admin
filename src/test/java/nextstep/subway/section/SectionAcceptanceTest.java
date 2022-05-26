@@ -146,8 +146,8 @@ class SectionAcceptanceTest extends BaseAcceptanceTest {
     @Test
     void cannotAddNotContainsStation() {
         // given
-        long 새로운상행역_id = RestUtils.id_추출(StationRestAssured.지하철역_생성_요청("상행역"));
-        long 새로운하행역_id = RestUtils.id_추출(StationRestAssured.지하철역_생성_요청("하행역"));
+        long 새로운상행역_id = RestUtils.id_추출(StationRestAssured.지하철역_생성_요청("새로운상행역"));
+        long 새로운하행역_id = RestUtils.id_추출(StationRestAssured.지하철역_생성_요청("새로운하행역"));
 
         // when
         ExtractableResponse<Response> response = 지하철구간_등록_요청(새로운상행역_id, 새로운하행역_id, 10);
@@ -166,7 +166,7 @@ class SectionAcceptanceTest extends BaseAcceptanceTest {
     }
 
     private void 지하철구간_등록됨(ExtractableResponse<Response> response) {
-        assertResponseStatus(response, HttpStatus.CREATED);
+        assertResponseStatus(response, HttpStatus.OK);
     }
 
     private void 지하철구간_등록_안됨(ExtractableResponse<Response> response) {
