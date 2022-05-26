@@ -13,6 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철구간 관련 기능")
+@Transactional
 class SectionAcceptanceTest extends BaseAcceptanceTest {
     private static final int DEFAULT_DISTANCE = 10;
 
@@ -179,7 +181,7 @@ class SectionAcceptanceTest extends BaseAcceptanceTest {
         long 새로운상행역_id = RestUtils.id_추출(StationRestAssured.지하철역_생성_요청("새로운상행역"));
         long 새로운하행역_id = RestUtils.id_추출(StationRestAssured.지하철역_생성_요청("새로운하행역"));
         지하철구간_등록_요청(새로운상행역_id, 상행역_id, 20);
-        지하철구간_등록_요청(새로운하행역_id, 하행역_id, 30);
+        지하철구간_등록_요청(하행역_id, 새로운하행역_id, 30);
 
         // when
         ExtractableResponse<Response> response = 지하철구간_삭제_요청(새로운상행역_id);
@@ -204,7 +206,7 @@ class SectionAcceptanceTest extends BaseAcceptanceTest {
         long 새로운상행역_id = RestUtils.id_추출(StationRestAssured.지하철역_생성_요청("새로운상행역"));
         long 새로운하행역_id = RestUtils.id_추출(StationRestAssured.지하철역_생성_요청("새로운하행역"));
         지하철구간_등록_요청(새로운상행역_id, 상행역_id, 20);
-        지하철구간_등록_요청(새로운하행역_id, 하행역_id, 30);
+        지하철구간_등록_요청(하행역_id, 새로운하행역_id, 30);
 
         // when
         ExtractableResponse<Response> response = 지하철구간_삭제_요청(상행역_id);
