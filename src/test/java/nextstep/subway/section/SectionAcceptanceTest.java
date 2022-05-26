@@ -234,8 +234,10 @@ class SectionAcceptanceTest extends BaseAcceptanceTest {
     @Test
     void deleteOnlyOneSectionStation() {
         // when
+        ExtractableResponse<Response> response = RestUtils.delete(SECTION_URL + "?stationId=" + 상행역_id);
 
         // then
+        assertResponseStatus(response, HttpStatus.BAD_REQUEST);
     }
 
     private ExtractableResponse<Response> 지하철구간_등록_요청(long upStationId, long downStationId, int distance) {
