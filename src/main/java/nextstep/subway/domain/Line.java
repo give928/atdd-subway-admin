@@ -46,15 +46,19 @@ public class Line extends BaseEntity {
                 .orElseThrow(() -> new IllegalArgumentException(ErrorMessages.REQUIRED_LINE_COLOR));
     }
 
-    public void addSection(Section section) {
-        this.sections.add(section);
+    public boolean addSection(Section section) {
         section.updateLine(this);
+        return this.sections.add(section);
     }
 
     public Line update(String name, String color) {
         this.name = validateIfEmptyName(name);
         this.color = validateIfEmptyColor(color);
         return this;
+    }
+
+    public boolean removeSection(Station station) {
+        return sections.remove(station);
     }
 
     public Long getId() {
