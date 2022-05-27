@@ -10,6 +10,8 @@ import java.util.stream.Stream;
 
 @Embeddable
 public class Sections {
+    public static final int MINIMUM_SECTION_SIZE = 1;
+
     @OneToMany(mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Section> values;
 
@@ -69,7 +71,7 @@ public class Sections {
     }
 
     private void validateRemove() {
-        if (values.size() <= 1) {
+        if (values.size() <= MINIMUM_SECTION_SIZE) {
             throw new IllegalArgumentException(ErrorMessages.CAN_NOT_REMOVE_ONLY_ONE_SECTION);
         }
     }
