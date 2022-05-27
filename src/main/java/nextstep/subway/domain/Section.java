@@ -66,13 +66,13 @@ public class Section extends BaseEntity {
         return downStation;
     }
 
-    public void reduceDistance(Section section) {
+    public void reduceDistanceIfInnerSection(Section section) {
         if (isInner(section)) {
             this.distance.reduce(section.getDistance());
         }
     }
 
-    public void merge(Section section) {
+    public void mergeIfOuterSection(Section section) {
         if (isOuter(section)) {
             mergeStation(section);
             mergeDistance(section);
@@ -132,17 +132,6 @@ public class Section extends BaseEntity {
 
     private boolean isOuter(Section section) {
         return upStation.isSame(section.getDownStation()) || downStation.isSame(section.getUpStation());
-    }
-
-    @Override
-    public String toString() {
-        return "Section{" +
-                "id=" + id +
-                ", upStation=" + upStation +
-                ", downStation=" + downStation +
-                ", distance=" + distance.get() +
-                ", line.id=" + line.getId() +
-                '}';
     }
 
     private static final class ErrorMessages {

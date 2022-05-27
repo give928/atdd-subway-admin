@@ -76,14 +76,6 @@ public class Station extends BaseEntity {
         return Objects.hash(getId());
     }
 
-    @Override
-    public String toString() {
-        return "Station{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                '}';
-    }
-
     private static final class ErrorMessages {
         private static final String REQUIRED_STATION_NAME = "지하철역 이름은 필수입니다.";
 

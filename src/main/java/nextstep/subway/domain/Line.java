@@ -77,16 +77,6 @@ public class Line extends BaseEntity {
         return sections.getStations();
     }
 
-    @Override
-    public String toString() {
-        return "Line{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", color='" + color + '\'' +
-                ", sections=" + sections +
-                '}';
-    }
-
     private static final class ErrorMessages {
         private static final String REQUIRED_LINE_NAME = "지하철노선 이름은 필수입니다.";
         private static final String REQUIRED_LINE_COLOR = "지하철노선 색상은 필수입니다.";

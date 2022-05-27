@@ -33,28 +33,28 @@ public class Sections {
 
     public boolean add(Section section) {
         if (!values.isEmpty()) {
-            reduceLinkSection(section);
+            reduceDistanceIfInnerSection(section);
         }
         return this.values.add(section);
     }
 
-    private void reduceLinkSection(Section section) {
-        Section linkSection = findLinkSection(section);
-        linkSection.reduceDistance(section);
+    private void reduceDistanceIfInnerSection(Section section) {
+        Section linkableSection = findLinkableSection(section);
+        linkableSection.reduceDistanceIfInnerSection(section);
     }
 
-    private Section findLinkSection(Section section) {
-        List<Section> linkSections = findLinkSections(section);
-        if (linkSections.isEmpty()) {
+    private Section findLinkableSection(Section section) {
+        List<Section> linkableSections = findLinkableSections(section);
+        if (linkableSections.isEmpty()) {
             throw new IllegalArgumentException(ErrorMessages.CAN_NOT_ADD_ISOLATED_STATIONS);
         }
-        if (linkSections.size() > 1) {
+        if (linkableSections.size() > 1) {
             throw new IllegalArgumentException(ErrorMessages.CAN_NOT_ADD_DUPLICATED_STATIONS);
         }
-        return linkSections.get(0);
+        return linkableSections.get(0);
     }
 
-    private List<Section> findLinkSections(Section section) {
+    private List<Section> findLinkableSections(Section section) {
         return values.stream()
                 .filter(s -> s.isLinkable(section))
                 .collect(Collectors.toList());
@@ -62,9 +62,10 @@ public class Sections {
 
     public boolean remove(Station station) {
         validateRemove();
-        List<Section> sections = findSections(station);
-        Section removeSection = findRemoveAndMergeSections(sections);
-        return values.remove(removeSection);
+        List<Section> sections = findLinkedSections(station);
+        Section removeSection = findRemoveSection(sections);
+        mergeIfLinkedSections(sections);
+        return this.values.remove(removeSection);
     }
 
     private void validateRemove() {
@@ -73,36 +74,31 @@ public class Sections {
         }
     }
 
-    private List<Section> findSections(Station station) {
-        List<Section> sections = values.stream()
+    private List<Section> findLinkedSections(Station station) {
+        return values.stream()
                 .filter(section -> section.getUpStation().isSame(station) || section.getDownStation().isSame(station))
                 .collect(Collectors.toList());
+    }
+
+    private Section findRemoveSection(List<Section> sections) {
         if (sections.isEmpty()) {
-            throw new IllegalArgumentException(String.format(ErrorMessages.CAN_NOT_FIND_STATION, station.getName()));
+            throw new IllegalArgumentException(ErrorMessages.CAN_NOT_FIND_STATION);
         }
-        return sections;
+        return sections.get(0);
     }
 
-    private Section findRemoveAndMergeSections(List<Section> sections) {
-        Section removeSection = sections.get(0);
+    private void mergeIfLinkedSections(List<Section> sections) {
         if (sections.size() > 1) {
-            Section mergeSection = sections.get(1);
-            mergeSection.merge(removeSection);
+            Section removeSection = sections.get(0);
+            Section remainSection = sections.get(1);
+            remainSection.mergeIfOuterSection(removeSection);
         }
-        return removeSection;
-    }
-
-    @Override
-    public String toString() {
-        return "Sections{" +
-                "values=" + values +
-                '}';
     }
 
     private static class ErrorMessages {
         public static final String CAN_NOT_ADD_DUPLICATED_STATIONS = "상행역과 하행역 둘 중 하나도 포함되어있지 않으면 추가할 수 없습니다.";
         public static final String CAN_NOT_ADD_ISOLATED_STATIONS = "상행역과 하행역이 이미 노선에 모두 등록되어 있어서 추가할 수 없습니다.";
-        public static final String CAN_NOT_FIND_STATION = "%s역이 등록된 구간이 없습니다.";
+        public static final String CAN_NOT_FIND_STATION = "해당역으로 등록된 구간이 없습니다.";
         public static final String CAN_NOT_REMOVE_ONLY_ONE_SECTION = "구간이 하나인 노선의 마지막 구간을 제거할 수 없습니다.";
 
         private ErrorMessages() {

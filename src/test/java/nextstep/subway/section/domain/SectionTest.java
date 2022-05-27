@@ -130,7 +130,7 @@ class SectionTest {
 
     @DisplayName("역 사이에 새로운 역 구간을 추가하면 기존 구간의 거리가 새로운 길이를 뺀 나머지로 변경된다.")
     @Test
-    void reduceDistance() {
+    void reduceDistanceIfInnerSection() {
         // given
         Station upStation = Station.of(1L, "상행역");
         Station downStation = Station.of(2L, "하행역");
@@ -138,7 +138,7 @@ class SectionTest {
         Section section = Section.of(upStation, Station.of(3L, "중간역"), 4);
 
         // when
-        linkSection.reduceDistance(section);
+        linkSection.reduceDistanceIfInnerSection(section);
 
         // then
         assertThat(linkSection.getDistance()).isEqualTo(1);
@@ -155,7 +155,7 @@ class SectionTest {
         Section section = Section.of(upStation, Station.of(3L, "중간역"), 5);
 
         // when
-        ThrowableAssert.ThrowingCallable throwingCallable = () -> linkSection.reduceDistance(section);
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> linkSection.reduceDistanceIfInnerSection(section);
 
         // then
         assertThatThrownBy(throwingCallable).isInstanceOf(IllegalArgumentException.class);
@@ -163,16 +163,16 @@ class SectionTest {
 
     @DisplayName("연결된 두 구간을 합치면 상행역과 하행역을 재배치하고 구간의 길이를 합한다.")
     @Test
-    void mergeSection() {
+    void mergeIfOuterSection() {
         // given
         Station upStation = Station.of(1L, "상행역");
         Station middleStation = Station.of(2L, "중간역");
         Station downStation = Station.of(3L, "하행역");
         Section section = Section.of(upStation, middleStation, 5);
-        Section deleteSection = Section.of(middleStation, downStation, 4);
+        Section removeSection = Section.of(middleStation, downStation, 4);
 
         // when
-        section.merge(deleteSection);
+        section.mergeIfOuterSection(removeSection);
 
         // then
         assertThat(section.getUpStation()).isEqualTo(upStation);
@@ -182,24 +182,24 @@ class SectionTest {
 
     @DisplayName("연결되지 않은 두 구간을 합치면 변경되지 않는다.")
     @Test
-    void notExtendDistance() {
+    void mergeIfNotLinkedSections() {
         // given
         Station upStation = Station.of(1L, "상행역");
         Station downStation = Station.of(2L, "하행역");
         Station otherUpStation = Station.of(3L, "다른상행역");
         Station otherDownStation = Station.of(4L, "다른하행역");
         Section section = Section.of(upStation, downStation, 5);
-        Section deleteSection = Section.of(otherUpStation, otherDownStation, 4);
+        Section removeSection = Section.of(otherUpStation, otherDownStation, 4);
 
         // when
-        section.merge(deleteSection);
+        section.mergeIfOuterSection(removeSection);
 
         // then
         assertThat(section.getUpStation()).isEqualTo(upStation);
         assertThat(section.getDownStation()).isEqualTo(downStation);
         assertThat(section.getDistance()).isEqualTo(5);
-        assertThat(deleteSection.getUpStation()).isEqualTo(otherUpStation);
-        assertThat(deleteSection.getDownStation()).isEqualTo(otherDownStation);
-        assertThat(deleteSection.getDistance()).isEqualTo(4);
+        assertThat(removeSection.getUpStation()).isEqualTo(otherUpStation);
+        assertThat(removeSection.getDownStation()).isEqualTo(otherDownStation);
+        assertThat(removeSection.getDistance()).isEqualTo(4);
     }
 }
