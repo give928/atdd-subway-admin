@@ -64,5 +64,5 @@ public ResponseEntity removeLineStation(
 ![img3](https://techcourse-storage.s3.ap-northeast-2.amazonaws.com/019e7f82cb5d4b0d833ce41e3c43fd0f)
 
 ## 기능 목록
-- [ ] 지하철 구간 제거 인수 테스트
-- [ ] 지하철 구간 제거 구현
+- [x] 지하철 구간 제거 인수 테스트
+- [x] 지하철 구간 제거 구현
