@@ -1,54 +1,71 @@
 package nextstep.subway.advice;
 
 import nextstep.subway.advice.dto.ErrorDto;
-import nextstep.subway.advice.dto.ErrorMessageDto;
+import nextstep.subway.exception.MessageCodeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
+import org.springframework.context.NoSuchMessageException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.Locale;
 
 @RestControllerAdvice(basePackages = {"nextstep.subway.ui"})
 public class ApiExceptionAdvice {
-    private static final String ERROR_MESSAGE_INTERNAL_SERVER_ERROR = "서버 내부 오류";
-
     private final Logger log = LoggerFactory.getLogger(getClass());
+    private final MessageSource messageSource;
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ErrorDto handleIllegalArgumentException(IllegalArgumentException e) {
-        log.error("handleIllegalArgumentException", e);
-        return handleCustomException(e);
+    public ApiExceptionAdvice(MessageSource messageSource) {
+        this.messageSource = messageSource;
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MessageCodeException.class)
+    public ResponseEntity<ErrorDto> handleMessageCodeException(MessageCodeException e) {
+        log.error("handleMessageCodeException", e);
+        return ResponseEntity.badRequest().body(
+                new ErrorDto(HttpStatus.BAD_REQUEST, getMessage(e.getCode(), e.getArgs())));
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ErrorDto handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+    public ResponseEntity<ErrorDto> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
         log.error("handleDataIntegrityViolationException", e);
-        return handleCustomException(e);
+        return ResponseEntity.badRequest().body(new ErrorDto(HttpStatus.BAD_REQUEST, getErrorMessage(e)));
     }
 
-    private ErrorDto handleCustomException(RuntimeException e) {
-        if (StringUtils.hasText(e.getMessage())) {
-            return new ErrorMessageDto(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
-        return handleRuntimeException(e);
-    }
-
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(RuntimeException.class)
-    public ErrorDto handleRuntimeException(RuntimeException e) {
-        log.error("handleRuntimeException", e);
-        return handleException(e);
-    }
-
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler
-    public ErrorDto handleException(Exception e) {
+    public ResponseEntity<ErrorDto> handleException(Exception e) {
         log.error("handleException", e);
-        return new ErrorMessageDto(HttpStatus.INTERNAL_SERVER_ERROR, ERROR_MESSAGE_INTERNAL_SERVER_ERROR);
+        return ResponseEntity.internalServerError().body(
+                new ErrorDto(HttpStatus.INTERNAL_SERVER_ERROR, getErrorMessage(e)));
+    }
+
+    private String getMessage(String code, Object[] args) {
+        try {
+            String message = messageSource.getMessage(code, args, Locale.getDefault());
+            if (StringUtils.hasText(message)) {
+                return message;
+            }
+        } catch (NoSuchMessageException ex) {
+            log.info("Not found message code: {}", code);
+        }
+        return code;
+    }
+
+    private String getErrorMessage(Exception e) {
+        try {
+            String message = messageSource.getMessage(String.format("error.%s", e.getClass().getName()), null,
+                                                      Locale.getDefault());
+            if (StringUtils.hasText(message)) {
+                return message;
+            }
+        } catch (NoSuchMessageException ex) {
+            log.info("Not found message code: {}", e.getClass().getName());
+        }
+        return messageSource.getMessage("error.java.lang.Exception", null, Locale.getDefault());
     }
 }

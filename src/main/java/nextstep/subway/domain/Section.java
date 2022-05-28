@@ -1,5 +1,7 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.exception.MessageCodeException;
+
 import javax.persistence.*;
 
 @Entity
@@ -40,13 +42,13 @@ public class Section extends BaseEntity {
 
     private static void validateStation(Station upStation, Station downStation) {
         if (upStation == null) {
-            throw new IllegalArgumentException(ErrorMessages.REQUIRED_SECTION_UP_STATION);
+            throw new MessageCodeException("error.section.required.up_station");
         }
         if (downStation == null) {
-            throw new IllegalArgumentException(ErrorMessages.REQUIRED_SECTION_DOWN_STATION);
+            throw new MessageCodeException("error.section.required.down_station");
         }
         if (upStation.isSame(downStation)) {
-            throw new IllegalArgumentException(ErrorMessages.REQUIRED_DIFFERENT_SECTION_STATIONS);
+            throw new MessageCodeException("error.section.add.same_stations");
         }
     }
 
@@ -125,22 +127,12 @@ public class Section extends BaseEntity {
         boolean sameUpStation = upStation.isSame(section.getUpStation());
         boolean sameDownStation = downStation.isSame(section.getDownStation());
         if (sameUpStation && sameDownStation) {
-            throw new IllegalArgumentException(ErrorMessages.CAN_NOT_ADD_DUPLICATED_STATIONS);
+            throw new IllegalArgumentException("error.section.add.exists_stations");
         }
         return sameUpStation || sameDownStation;
     }
 
     private boolean isOuter(Section section) {
         return upStation.isSame(section.getDownStation()) || downStation.isSame(section.getUpStation());
-    }
-
-    private static final class ErrorMessages {
-        private static final String REQUIRED_SECTION_UP_STATION = "지하철구간의 상행 지하철역은 필수입니다.";
-        private static final String REQUIRED_SECTION_DOWN_STATION = "지하철구간의 하행 지하철역은 필수입니다.";
-        private static final String REQUIRED_DIFFERENT_SECTION_STATIONS = "지하철구간의 상행 지하철역과 하행 지하철역을 하나의 역으로 지정할 수 없습니다.";
-        private static final String CAN_NOT_ADD_DUPLICATED_STATIONS = "상행역과 하행역이 이미 노선에 모두 등록되어 있어서 추가할 수 없습니다.";
-
-        private ErrorMessages() {
-        }
     }
 }

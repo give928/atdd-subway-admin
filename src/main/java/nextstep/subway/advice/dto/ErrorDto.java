@@ -6,10 +6,12 @@ import java.time.LocalDateTime;
 
 public class ErrorDto {
     private final HttpStatus httpStatus;
-    private final LocalDateTime date = LocalDateTime.now();
+    private final String message;
+    private final LocalDateTime timestamp = LocalDateTime.now();
 
-    public ErrorDto(HttpStatus httpStatus) {
+    public ErrorDto(HttpStatus httpStatus, String message) {
         this.httpStatus = httpStatus;
+        this.message = message;
     }
 
     public int getStatusCode() {
@@ -20,7 +22,11 @@ public class ErrorDto {
         return httpStatus.getReasonPhrase();
     }
 
-    public LocalDateTime getDate() {
-        return date;
+    public String getMessage() {
+        return message;
+    }
+
+    public LocalDateTime getTimestamp() {
+        return timestamp;
     }
 }

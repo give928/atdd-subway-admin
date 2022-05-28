@@ -1,5 +1,7 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.exception.MessageCodeException;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
@@ -48,10 +50,10 @@ public class Sections {
     private Section findLinkableSection(Section section) {
         List<Section> linkableSections = findLinkableSections(section);
         if (linkableSections.isEmpty()) {
-            throw new IllegalArgumentException(ErrorMessages.CAN_NOT_ADD_ISOLATED_STATIONS);
+            throw new MessageCodeException("error.section.add.not_exists_stations");
         }
         if (linkableSections.size() > 1) {
-            throw new IllegalArgumentException(ErrorMessages.CAN_NOT_ADD_DUPLICATED_STATIONS);
+            throw new MessageCodeException("error.section.add.exists_stations");
         }
         return linkableSections.get(0);
     }
@@ -72,7 +74,7 @@ public class Sections {
 
     private void validateRemove() {
         if (values.size() <= MINIMUM_SECTION_SIZE) {
-            throw new IllegalArgumentException(ErrorMessages.CAN_NOT_REMOVE_ONLY_ONE_SECTION);
+            throw new MessageCodeException("error.section.remove.only_one_section");
         }
     }
 
@@ -84,7 +86,7 @@ public class Sections {
 
     private Section findRemoveSection(List<Section> sections) {
         if (sections.isEmpty()) {
-            throw new IllegalArgumentException(ErrorMessages.CAN_NOT_FIND_STATION);
+            throw new MessageCodeException("error.section.remove.not_found_station");
         }
         return sections.get(0);
     }
@@ -94,16 +96,6 @@ public class Sections {
             Section removeSection = sections.get(0);
             Section remainSection = sections.get(1);
             remainSection.mergeIfOuterSection(removeSection);
-        }
-    }
-
-    private static class ErrorMessages {
-        public static final String CAN_NOT_ADD_DUPLICATED_STATIONS = "상행역과 하행역 둘 중 하나도 포함되어있지 않으면 추가할 수 없습니다.";
-        public static final String CAN_NOT_ADD_ISOLATED_STATIONS = "상행역과 하행역이 이미 노선에 모두 등록되어 있어서 추가할 수 없습니다.";
-        public static final String CAN_NOT_FIND_STATION = "해당역으로 등록된 구간이 없습니다.";
-        public static final String CAN_NOT_REMOVE_ONLY_ONE_SECTION = "구간이 하나인 노선의 마지막 구간을 제거할 수 없습니다.";
-
-        private ErrorMessages() {
         }
     }
 }

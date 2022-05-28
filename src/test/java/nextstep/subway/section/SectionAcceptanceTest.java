@@ -295,7 +295,7 @@ class SectionAcceptanceTest extends BaseAcceptanceTest {
     }
 
     private void 지하철구간_삭제_안됨(ExtractableResponse<Response> response) {
-        assertResponseStatus(response, HttpStatus.BAD_REQUEST);
+        assertThat(response.statusCode()).isIn(HttpStatus.BAD_REQUEST.value(), HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     private void 지하철구간_종점역_삭제_검증(long deleteStationId, long lastUpStationId) {
