@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,22 +25,21 @@ public class ApiExceptionAdvice {
 
     @ExceptionHandler(MessageCodeException.class)
     public ResponseEntity<ErrorDto> handleMessageCodeException(MessageCodeException e) {
-        log.error("handleMessageCodeException", e);
-        return ResponseEntity.badRequest().body(
-                new ErrorDto(HttpStatus.BAD_REQUEST, getMessage(e.getCode(), e.getArgs())));
+        String message = getMessage(e.getCode(), e.getArgs());
+        log.error("handleMessageCodeException: {}", message, e);
+        return ResponseEntity.badRequest().body(new ErrorDto(message));
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorDto> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
         log.error("handleDataIntegrityViolationException", e);
-        return ResponseEntity.badRequest().body(new ErrorDto(HttpStatus.BAD_REQUEST, getErrorMessage(e)));
+        return ResponseEntity.badRequest().body(new ErrorDto(getErrorMessage(e)));
     }
 
     @ExceptionHandler
     public ResponseEntity<ErrorDto> handleException(Exception e) {
         log.error("handleException", e);
-        return ResponseEntity.internalServerError().body(
-                new ErrorDto(HttpStatus.INTERNAL_SERVER_ERROR, getErrorMessage(e)));
+        return ResponseEntity.internalServerError().body(new ErrorDto(getErrorMessage(e)));
     }
 
     private String getMessage(String code, Object[] args) {
