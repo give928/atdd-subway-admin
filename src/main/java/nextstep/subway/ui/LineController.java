@@ -5,7 +5,6 @@ import nextstep.subway.dto.LineResponse;
 import nextstep.subway.dto.LineSaveRequest;
 import nextstep.subway.dto.LineUpdateRequest;
 import nextstep.subway.dto.SectionRequest;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,13 +54,9 @@ public class LineController {
         return ResponseEntity.ok().build();
     }
 
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<Void> handleIllegalArgsException() {
-        return ResponseEntity.badRequest().build();
-    }
-
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Void> handleRuntimeException() {
-        return ResponseEntity.badRequest().build();
+    @DeleteMapping("/{id}/sections")
+    public ResponseEntity<LineResponse> addSection(@PathVariable Long id, @RequestParam Long stationId) {
+        lineService.removeSection(id, stationId);
+        return ResponseEntity.ok().build();
     }
 }

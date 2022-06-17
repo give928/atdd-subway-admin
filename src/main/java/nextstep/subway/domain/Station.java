@@ -1,5 +1,7 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.exception.MessageCodeException;
+
 import javax.persistence.*;
 import java.util.Objects;
 import java.util.Optional;
@@ -33,7 +35,7 @@ public class Station extends BaseEntity {
         return Optional.ofNullable(name)
                 .map(String::trim)
                 .filter(s -> s.length() > 0)
-                .orElseThrow(() -> new IllegalArgumentException(ErrorMessages.REQUIRED_STATION_NAME));
+                .orElseThrow(() -> new MessageCodeException("error.station.required.name"));
     }
 
     public Long getId() {
@@ -74,20 +76,5 @@ public class Station extends BaseEntity {
     @Override
     public int hashCode() {
         return Objects.hash(getId());
-    }
-
-    @Override
-    public String toString() {
-        return "Station{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                '}';
-    }
-
-    private static final class ErrorMessages {
-        private static final String REQUIRED_STATION_NAME = "지하철역 이름은 필수입니다.";
-
-        private ErrorMessages() {
-        }
     }
 }

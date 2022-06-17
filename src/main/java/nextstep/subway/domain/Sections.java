@@ -1,5 +1,7 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.exception.MessageCodeException;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
@@ -10,6 +12,8 @@ import java.util.stream.Stream;
 
 @Embeddable
 public class Sections {
+    public static final int MINIMUM_SECTION_SIZE = 1;
+
     @OneToMany(mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Section> values;
 
@@ -25,53 +29,73 @@ public class Sections {
         return new Sections(sections);
     }
 
-    public boolean add(Section section) {
-        if (!values.isEmpty()) {
-            reduceLinkSection(section);
-        }
-        return this.values.add(section);
-    }
-
-    private void reduceLinkSection(Section section) {
-        Section linkSection = findLinkSection(section);
-        linkSection.reduceDistance(section);
-    }
-
-    private Section findLinkSection(Section section) {
-        List<Section> linkSections = findLinkSections(section);
-        if (linkSections.isEmpty()) {
-            throw new IllegalArgumentException(ErrorMessages.CAN_NOT_ADD_ISOLATED_STATIONS);
-        }
-        if (linkSections.size() > 1) {
-            throw new IllegalArgumentException(ErrorMessages.CAN_NOT_ADD_DUPLICATED_STATIONS);
-        }
-        return linkSections.get(0);
-    }
-
-    private List<Section> findLinkSections(Section section) {
-        return values.stream()
-                .filter(s -> s.isLinkable(section))
-                .collect(Collectors.toList());
-    }
-
     public List<Station> getStations() {
         return values.stream()
                 .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public String toString() {
-        return "Sections{" +
-                "values=" + values +
-                '}';
+    public boolean add(Section section) {
+        if (!values.isEmpty()) {
+            reduceDistanceIfInnerSection(section);
+        }
+        return this.values.add(section);
     }
 
-    private static class ErrorMessages {
-        public static final String CAN_NOT_ADD_DUPLICATED_STATIONS = "상행역과 하행역 둘 중 하나도 포함되어있지 않으면 추가할 수 없습니다.";
-        public static final String CAN_NOT_ADD_ISOLATED_STATIONS = "상행역과 하행역이 이미 노선에 모두 등록되어 있어서 추가할 수 없습니다.";
+    private void reduceDistanceIfInnerSection(Section section) {
+        Section linkableSection = findLinkableSection(section);
+        linkableSection.reduceDistanceIfInnerSection(section);
+    }
 
-        private ErrorMessages() {
+    private Section findLinkableSection(Section section) {
+        List<Section> linkableSections = findLinkableSections(section);
+        if (linkableSections.isEmpty()) {
+            throw new MessageCodeException("error.section.add.not_exists_stations");
+        }
+        if (linkableSections.size() > 1) {
+            throw new MessageCodeException("error.section.add.exists_stations");
+        }
+        return linkableSections.get(0);
+    }
+
+    private List<Section> findLinkableSections(Section section) {
+        return values.stream()
+                .filter(s -> s.isLinkable(section))
+                .collect(Collectors.toList());
+    }
+
+    public boolean remove(Station station) {
+        validateRemove();
+        List<Section> sections = findLinkedSections(station);
+        Section removeSection = findRemoveSection(sections);
+        mergeIfLinkedSections(sections);
+        return this.values.remove(removeSection);
+    }
+
+    private void validateRemove() {
+        if (values.size() <= MINIMUM_SECTION_SIZE) {
+            throw new MessageCodeException("error.section.remove.only_one_section");
+        }
+    }
+
+    private List<Section> findLinkedSections(Station station) {
+        return values.stream()
+                .filter(section -> section.getUpStation().isSame(station) || section.getDownStation().isSame(station))
+                .collect(Collectors.toList());
+    }
+
+    private Section findRemoveSection(List<Section> sections) {
+        if (sections.isEmpty()) {
+            throw new MessageCodeException("error.section.remove.not_found_station");
+        }
+        return sections.get(0);
+    }
+
+    private void mergeIfLinkedSections(List<Section> sections) {
+        if (sections.size() > 1) {
+            Section removeSection = sections.get(0);
+            Section remainSection = sections.get(1);
+            remainSection.mergeIfOuterSection(removeSection);
         }
     }
 }

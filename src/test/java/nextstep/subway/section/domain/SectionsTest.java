@@ -55,8 +55,11 @@ class SectionsTest {
     @DisplayName("새로운 역을 상행 종점으로 등록한다.")
     @Test
     void addUpSection() {
+        // given
+        Station 새로운상행역 = Station.of(5L, "새로운상행역");
+
         // when
-        boolean result = sections.add(Section.of(새로운역, 상행역, 9));
+        boolean result = sections.add(Section.of(새로운상행역, 상행역, 9));
 
         // then
         assertThat(result).isTrue();
@@ -65,8 +68,11 @@ class SectionsTest {
     @DisplayName("새로운 역을 하행 종점으로 등록한다.")
     @Test
     void addDownSection() {
+        // given
+        Station 새로운하행역 = Station.of(5L, "새로운하행역");
+
         // when
-        boolean result = sections.add(Section.of(하행역, 새로운역, 9));
+        boolean result = sections.add(Section.of(하행역, 새로운하행역, 9));
 
         // then
         assertThat(result).isTrue();
@@ -103,6 +109,46 @@ class SectionsTest {
 
         // when
         ThrowableAssert.ThrowingCallable throwingCallable = () -> sections.add(Section.of(새로운상행역, 새로운하행역, 5));
+
+        // then
+        assertThatThrownBy(throwingCallable).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("종점역을 제거한다.")
+    @ParameterizedTest(name = "{displayName} station={0}")
+    @CsvSource({"상행역", "하행역"})
+    void removeLastSection(Station station) {
+        // when
+        boolean result = sections.remove(station);
+
+        // then
+        assertThat(result).isTrue();
+        assertThat(sections.getStations()).allMatch(s -> !s.isSame(station));
+    }
+
+    @DisplayName("중간역을 제거하면 구간이 제거되고 연결된 구간의 거리가 늘어난다.")
+    @Test
+    void removeMiddleSection() {
+        // when
+        boolean result = sections.remove(중간역);
+
+        // then
+        assertThat(result).isTrue();
+        assertThat(sections.getStations()).allMatch(s -> !s.isSame(중간역));
+        Section section = 중간하행구간;
+        if (!상행중간구간.getUpStation().isSame(중간역) && !상행중간구간.getDownStation().isSame(중간역)) {
+            section = 상행중간구간;
+        }
+        assertThat(section.getUpStation()).isEqualTo(상행역);
+        assertThat(section.getDownStation()).isEqualTo(하행역);
+        assertThat(section.getDistance()).isEqualTo(20);
+    }
+
+    @DisplayName("등록되지 않은 역을 제거할 수 없다.")
+    @Test
+    void thrownByNotExistsStation() {
+        // when
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> sections.remove(Station.of(9999L, "테스트"));
 
         // then
         assertThatThrownBy(throwingCallable).isInstanceOf(IllegalArgumentException.class);

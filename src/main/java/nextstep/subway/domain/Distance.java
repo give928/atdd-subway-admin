@@ -1,5 +1,7 @@
 package nextstep.subway.domain;
 
+import nextstep.subway.exception.MessageCodeException;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.util.Objects;
@@ -25,8 +27,7 @@ public class Distance {
 
     private static int validateIfDistance(int value) {
         if (value < MIN_DISTANCE) {
-            throw new IllegalArgumentException(
-                    String.format(ErrorMessages.REQUIRED_GREATER_THAN_OR_EQUAL_TO_SECTION_DISTANCE, MIN_DISTANCE));
+            throw new MessageCodeException("error.section.add.minimum_distance", new Object[] {MIN_DISTANCE});
         }
         return value;
     }
@@ -34,10 +35,15 @@ public class Distance {
     public int reduce(int distance) {
         int updateValue = this.value - distance;
         if (updateValue < MIN_DISTANCE) {
-            throw new IllegalArgumentException(ErrorMessages.CAN_NOT_ADD_OVERFLOW_DISTANCE);
+            throw new MessageCodeException("error.section.add.overflow_distance");
         }
         this.value = updateValue;
-        return updateValue;
+        return this.value;
+    }
+
+    public int extend(int distance) {
+        this.value += distance;
+        return this.value;
     }
 
     public int get() {
@@ -59,13 +65,5 @@ public class Distance {
     @Override
     public int hashCode() {
         return Objects.hash(value);
-    }
-
-    private static final class ErrorMessages {
-        private static final String REQUIRED_GREATER_THAN_OR_EQUAL_TO_SECTION_DISTANCE = "지하철구간의 거리는 %d 이상만 가능합니다.";
-        private static final String CAN_NOT_ADD_OVERFLOW_DISTANCE = "기존 역 사이 길이보다 크거나 같으면 등록을 할 수 없습니다.";
-
-        private ErrorMessages() {
-        }
     }
 }

@@ -55,4 +55,17 @@ class DistanceTest {
         // then
         assertThatThrownBy(throwingCallable).isInstanceOf(IllegalArgumentException.class);
     }
+
+    @DisplayName("거리를 늘린다.")
+    @Test
+    void extend() {
+        // given
+        Distance distance = Distance.of(10);
+
+        // when
+        int result = distance.extend(10);
+
+        // then
+        assertThat(result).isEqualTo(20);
+    }
 }
