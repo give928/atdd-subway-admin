@@ -13,19 +13,23 @@ public class Station extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String name;
 
-    public Station() {
+    protected Station() {
     }
 
-    public Station(String name) {
-        this.name = validateIfEmptyName(name);
-    }
-
-    public Station(Long id, String name) {
+    private Station(Long id, String name) {
         this.id = id;
-        this.name = validateIfEmptyName(name);
+        this.name = name;
     }
 
-    private String validateIfEmptyName(String name) {
+    public static Station of(String name) {
+        return of(null, validateIfEmptyName(name));
+    }
+
+    public static Station of(Long id, String name) {
+        return new Station(id, validateIfEmptyName(name));
+    }
+
+    private static String validateIfEmptyName(String name) {
         return Optional.ofNullable(name)
                 .map(String::trim)
                 .filter(s -> s.length() > 0)
@@ -38,6 +42,21 @@ public class Station extends BaseEntity {
 
     public String getName() {
         return name;
+    }
+
+    public boolean isSame(Station station) {
+        if (isSameStationId(station)) {
+            return true;
+        }
+        return isSameStationName(station);
+    }
+
+    private boolean isSameStationId(Station station) {
+        return getId() != null && getId().equals(station.getId());
+    }
+
+    private boolean isSameStationName(Station station) {
+        return getName() != null && getName().equals(station.getName());
     }
 
     @Override

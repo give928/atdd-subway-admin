@@ -22,20 +22,24 @@ public class Line extends BaseEntity {
     protected Line() {
     }
 
-    public Line(String name, String color, Station upStation, Station downStation, int distance) {
-        this.name = validateIfEmptyName(name);
-        this.color = validateIfEmptyColor(color);
-        addSection(new Section(upStation, downStation, distance));
+    private Line(String name, String color, Section section) {
+        this.name = name;
+        this.color = color;
+        addSection(section);
     }
 
-    private String validateIfEmptyName(String name) {
+    public static Line of(String name, String color, Station upStation, Station downStation, int distance) {
+        return new Line(validateIfEmptyName(name), validateIfEmptyColor(color), Section.of(upStation, downStation, distance));
+    }
+
+    private static String validateIfEmptyName(String name) {
         return Optional.ofNullable(name)
                 .map(String::trim)
                 .filter(s -> s.length() > 0)
                 .orElseThrow(() -> new IllegalArgumentException(ErrorMessages.REQUIRED_LINE_NAME));
     }
 
-    private String validateIfEmptyColor(String color) {
+    private static String validateIfEmptyColor(String color) {
         return Optional.ofNullable(color)
                 .map(String::trim)
                 .filter(s -> s.length() > 0)

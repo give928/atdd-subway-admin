@@ -11,17 +11,47 @@ import java.util.stream.Stream;
 @Embeddable
 public class Sections {
     @OneToMany(mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Section> values = new ArrayList<>();
+    private List<Section> values;
 
     protected Sections() {
+        this.values = new ArrayList<>();
     }
 
-    public Sections(List<Section> sections) {
+    private Sections(List<Section> sections) {
         this.values = sections;
     }
 
-    public void add(Section section) {
-        this.values.add(section);
+    public static Sections of(List<Section> sections) {
+        return new Sections(sections);
+    }
+
+    public boolean add(Section section) {
+        if (!values.isEmpty()) {
+            reduceLinkSection(section);
+        }
+        return this.values.add(section);
+    }
+
+    private void reduceLinkSection(Section section) {
+        Section linkSection = findLinkSection(section);
+        linkSection.reduceDistance(section);
+    }
+
+    private Section findLinkSection(Section section) {
+        List<Section> linkSections = findLinkSections(section);
+        if (linkSections.isEmpty()) {
+            throw new IllegalArgumentException(ErrorMessages.CAN_NOT_ADD_ISOLATED_STATIONS);
+        }
+        if (linkSections.size() > 1) {
+            throw new IllegalArgumentException(ErrorMessages.CAN_NOT_ADD_DUPLICATED_STATIONS);
+        }
+        return linkSections.get(0);
+    }
+
+    private List<Section> findLinkSections(Section section) {
+        return values.stream()
+                .filter(s -> s.isLinkable(section))
+                .collect(Collectors.toList());
     }
 
     public List<Station> getStations() {
@@ -35,5 +65,13 @@ public class Sections {
         return "Sections{" +
                 "values=" + values +
                 '}';
+    }
+
+    private static class ErrorMessages {
+        public static final String CAN_NOT_ADD_DUPLICATED_STATIONS = "상행역과 하행역 둘 중 하나도 포함되어있지 않으면 추가할 수 없습니다.";
+        public static final String CAN_NOT_ADD_ISOLATED_STATIONS = "상행역과 하행역이 이미 노선에 모두 등록되어 있어서 추가할 수 없습니다.";
+
+        private ErrorMessages() {
+        }
     }
 }
