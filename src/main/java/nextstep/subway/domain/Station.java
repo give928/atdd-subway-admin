@@ -1,20 +1,35 @@
 package nextstep.subway.domain;
 
 import javax.persistence.*;
+import java.util.Objects;
+import java.util.Optional;
 
 @Entity
 public class Station extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(unique = true)
+
+    @Column(nullable = false, unique = true)
     private String name;
 
     public Station() {
     }
 
     public Station(String name) {
-        this.name = name;
+        this.name = validateIfEmptyName(name);
+    }
+
+    public Station(Long id, String name) {
+        this.id = id;
+        this.name = validateIfEmptyName(name);
+    }
+
+    private String validateIfEmptyName(String name) {
+        return Optional.ofNullable(name)
+                .map(String::trim)
+                .filter(s -> s.length() > 0)
+                .orElseThrow(() -> new IllegalArgumentException(ErrorMessages.REQUIRED_STATION_NAME));
     }
 
     public Long getId() {
@@ -23,5 +38,37 @@ public class Station extends BaseEntity {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Station station = (Station) o;
+        return Objects.equals(getId(), station.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
+
+    @Override
+    public String toString() {
+        return "Station{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
+
+    private static final class ErrorMessages {
+        private static final String REQUIRED_STATION_NAME = "지하철역 이름은 필수입니다.";
+
+        private ErrorMessages() {
+        }
     }
 }

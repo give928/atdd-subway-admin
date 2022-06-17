@@ -4,45 +4,41 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
 
-import java.util.Map;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class BaseAcceptanceTest {
     @LocalServerPort
     int port;
 
+    @Autowired
+    DatabaseCleanup databaseCleanup;
+
     @BeforeEach
     void setUp() {
         if (RestAssured.port == RestAssured.UNDEFINED_PORT) {
             RestAssured.port = port;
+            databaseCleanup.afterPropertiesSet();
         }
+        databaseCleanup.execute();
     }
 
-    protected ExtractableResponse<Response> get(String path) {
-        return RestAssured.given().log().all()
-                .when().get(path)
-                .then().log().all()
-                .extract();
+    protected void assertResponseStatus(ExtractableResponse<Response> response, HttpStatus httpStatus) {
+        assertThat(response.statusCode()).isEqualTo(httpStatus.value());
     }
 
-    protected ExtractableResponse<Response> post(String path, Map<String, ?> params) {
-        return RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post(path)
-                .then().log().all()
-                .extract();
+    protected List<String> 이름추출(ExtractableResponse<Response> response) {
+        return response.jsonPath().getList("name", String.class);
     }
 
-    protected ExtractableResponse<Response> delete(String path) {
-        return RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete(path)
-                .then().log().all()
-                .extract();
+    protected long id추출(ExtractableResponse<Response> response) {
+        return response.jsonPath().getLong("id");
     }
 }
